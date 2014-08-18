@@ -1,4 +1,5 @@
 smbuilds
+build
 *.smx
 *.zip
 *.pyc
