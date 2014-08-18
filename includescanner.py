@@ -31,6 +31,6 @@ def find_last_time_modified(filename):
         return latest_time
 
     except OSError as e:
-        print e
+        print(e)
         util.error('Missing file: {}'.format(filename))
 

@@ -2,11 +2,11 @@ import os
 
 
 def warning(text):
-    print bcolors.WARNING + 'WARNING: ' + bcolors.ENDC + text
+    print(bcolors.WARNING + 'WARNING: ' + bcolors.ENDC + text)
 
 
 def error(text):
-    print bcolors.FAIL + 'ERROR: ' + bcolors.ENDC + text
+    print(bcolors.FAIL + 'ERROR: ' + bcolors.ENDC + text)
     exit(1)
 
 

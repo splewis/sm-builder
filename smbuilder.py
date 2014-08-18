@@ -120,7 +120,7 @@ class PackageContainer:
         self.filegroups = filegroups
 
     def create(self, output_dir):
-        print 'Building package {}.'.format(self.name)
+        print('Building package {}.'.format(self.name))
         package_dir = os.path.join(output_dir, self.name)
         plugin_dir = os.path.join(package_dir, self.plugin_out)
 
@@ -169,12 +169,12 @@ def perform_builds(config, compiler):
             compiled_count += 1
 
     for name, package in Packages.iteritems():
-        package.create('OUTPUT_DIR')
+        package.create(OUTPUT_DIR)
 
     if len(Plugins) == 0:
         util.warning('No plugins were found in {}.'.format(os.path.join(config, CONFIG_NAME)))
     elif compiled_count == 0:
-        print 'All plugins up to date.'
+        print('All plugins up to date.')
 
 
 if __name__ == '__main__':
