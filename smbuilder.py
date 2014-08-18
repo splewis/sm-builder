@@ -19,6 +19,9 @@ DirectoryStack = []
 Plugins = {}
 Packages = {}
 
+OUTPUT_DIR = 'smbuilds'
+CONFIG_NAME = 'smbuild'
+
 
 def glob_plugins(pattern):
     path = os.path.join(*DirectoryStack)
@@ -28,7 +31,7 @@ def glob_plugins(pattern):
 
 
 def execute_config(dir_path):
-    f = os.path.abspath(os.path.join(dir_path, 'smbuild'))
+    f = os.path.abspath(os.path.join(dir_path, CONFIG_NAME))
     if os.path.exists(f):
         context = {
             'Include': register_include,
@@ -124,7 +127,7 @@ class PackageContainer:
         for p in self.plugins:
             util.mkdir(plugin_dir)
             plugin = Plugins[p]
-            binary_path = os.path.join('smbuilds', 'plugins', p + '.smx')
+            binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
             shutil.copy2(binary_path, plugin_dir)
 
         for filegroup in self.filegroups:
@@ -135,8 +138,6 @@ class PackageContainer:
 
 
 def main():
-    global DirectoryStack
-
     parser = argparse.ArgumentParser(description='TODO')
     parser.add_argument('-cfg', '--config', default='.', help='Directory to read a smbuild config file from')
     parser.add_argument('-c', '--compiler', default='spcomp', help='Sourcepawn compiler to use, this is executed directly by a shell')
@@ -144,25 +145,35 @@ def main():
     args = parser.parse_args()
 
     if args.clean:
-        shutil.rmtree('smbuilds')
-        return
+        shutil.rmtree(OUTPUT_DIR)
+    else:
+        perform_builds(args.config, args.compiler)
 
-    util.mkdir('smbuilds')
-    util.mkdir('smbuilds/plugins')
 
-    DirectoryStack = [args.config]
-    execute_config(args.config)
+def clean():
+    shutil.rmtree(OUTPUT_DIR)
+
+
+def perform_builds(config, compiler):
+    global DirectoryStack
+
+    plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
+
+    util.mkdir(OUTPUT_DIR)
+    util.mkdir(plugin_build_dir)
+    DirectoryStack = [config]
+    execute_config(config)
 
     compiled_count = 0
     for name, plugin in Plugins.iteritems():
-        if plugin.compile(args.compiler, os.path.join('smbuilds', 'plugins')):
+        if plugin.compile(compiler, plugin_build_dir):
             compiled_count += 1
 
     for name, package in Packages.iteritems():
-        package.create('smbuilds')
+        package.create('OUTPUT_DIR')
 
     if len(Plugins) == 0:
-        util.warning('No plugins were found in {}.'.format(os.path.join(ActiveDirectory, 'smbuild')))
+        util.warning('No plugins were found in {}.'.format(os.path.join(ActiveDirectory, CONFIG_NAME)))
     elif compiled_count == 0:
         print 'All plugins up to date.'
 
