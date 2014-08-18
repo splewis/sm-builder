@@ -126,7 +126,6 @@ class PackageContainer:
 
         for p in self.plugins:
             util.mkdir(plugin_dir)
-            plugin = Plugins[p]
             binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
             shutil.copy2(binary_path, plugin_dir)
 
@@ -173,7 +172,7 @@ def perform_builds(config, compiler):
         package.create('OUTPUT_DIR')
 
     if len(Plugins) == 0:
-        util.warning('No plugins were found in {}.'.format(os.path.join(ActiveDirectory, CONFIG_NAME)))
+        util.warning('No plugins were found in {}.'.format(os.path.join(config, CONFIG_NAME)))
     elif compiled_count == 0:
         print 'All plugins up to date.'
 
