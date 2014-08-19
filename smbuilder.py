@@ -71,6 +71,7 @@ class PluginContainer:
         self.name = name
         self.source = os.path.abspath(source)
         self.compiler = compiler
+        self.included_source = []
 
     def compile(self, compiler, output_dir):
         latest_source_change = includescanner.find_last_time_modified(self.source)
@@ -96,7 +97,7 @@ class PluginContainer:
             return False
 
 
-def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugins', filegroups=None):
+def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugins', filegroups=None, extends=None):
     if not name:
         util.error('Packages must specify a name')
     if name in Packages:
@@ -108,26 +109,65 @@ def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugi
         for dir in filegroups:
             current_path = os.path.join(*DirectoryStack)
             filegroups[dir] = map(lambda f: os.path.abspath(os.path.join(current_path, f)), filegroups[dir])
+    else:
+        filegroups = {}
 
-    Packages[name] = PackageContainer(name, plugins, plugin_out, filegroups)
+    if not plugins:
+        plugins = []
+
+    if not extends:
+        extends = []
+
+    Packages[name] = PackageContainer(name, plugins, plugin_out, filegroups, extends)
 
 
 class PackageContainer:
-    def __init__(self, name, plugins, plugin_out, filegroups):
+    def __init__(self, name, plugins, plugin_out, filegroups, extends_list):
         self.name = name
         self.plugins = plugins
         self.plugin_out = plugin_out
         self.filegroups = filegroups
+        self.extends_list = extends_list
 
     def create(self, output_dir):
-        print('Building package {}.'.format(self.name))
+        global Plugins
+
+        for base_name in self.extends_list:
+            try:
+                base = Packages[base_name]
+            except KeyError:
+                util.error('Package {} extends non-existent package {}'.format(self.name, base_name))
+
+            self.plugins += base.plugins
+            for path, files in base.filegroups.iteritems():
+                if path not in self.filegroups:
+                    self.filegroups[path] = []
+                for f in files:
+                    # don't allow a base package to overwrite, use the 'lower' file
+                    if not f in self.filegroups[path]:
+                        self.filegroups[path].append(f)
+
         package_dir = os.path.join(output_dir, self.name)
+        # clears out the package
+        if os.path.exists(package_dir):
+            shutil.rmtree(package_dir)
+        util.mkdir(package_dir)
+
         plugin_dir = os.path.join(package_dir, self.plugin_out)
 
+        source_dir = os.path.join(plugin_dir, '..', 'scripting')
+        source_dir = os.path.abspath(source_dir)
+        util.mkdir(source_dir)
+
         for p in self.plugins:
+            if p not in Plugins:
+                util.error('Package {} used non-existent plugin {}'.format(self.name, p))
+
             util.mkdir(plugin_dir)
             binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
             shutil.copy2(binary_path, plugin_dir)
+            # TODO: a serious problem is that included files are not also copied over
+            shutil.copy2(Plugins[p].source, source_dir)
 
         for filegroup in self.filegroups:
             filegroup_out_dir = os.path.join(package_dir, filegroup)
@@ -154,7 +194,7 @@ def clean():
 
 
 def perform_builds(config, compiler):
-    global DirectoryStack
+    global DirectoryStack, Plugins
 
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
 
