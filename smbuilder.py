@@ -71,7 +71,7 @@ class PluginContainer:
         self.name = name
         self.source = os.path.abspath(source)
         self.compiler = compiler
-        self.config_source = self.config_source
+        self.config_source = config_source
 
     def compile(self, compiler, output_dir):
         latest_source_change = includescanner.find_last_time_modified(self.source)
