@@ -177,7 +177,7 @@ class PackageContainer:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='TODO')
+    parser = argparse.ArgumentParser(description='smbuild is a build and packaging tool for managing sourcemod plugins and servers')
     parser.add_argument('-cfg', '--config', default='.', help='Directory to read a smbuild config file from')
     parser.add_argument('-c', '--compiler', default='spcomp', help='Sourcepawn compiler to use, this is executed directly by a shell')
     parser.add_argument('--clean', action='store_true')
