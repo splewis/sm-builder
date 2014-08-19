@@ -69,12 +69,19 @@ def register_plugin(name=None, source=None, compiler=None):
 class PluginContainer:
     def __init__(self, name, source, compiler, config_source):
         self.name = name
-        self.source = os.path.abspath(source)
+        self.source = source
         self.compiler = compiler
         self.config_source = config_source
+        self.source_dir = os.path.relpath(os.path.dirname(source), '.')
+        self.source_files = set()
 
     def compile(self, compiler, output_dir):
-        latest_source_change = includescanner.find_last_time_modified(self.source)
+        active_path = os.path.join(*DirectoryStack)
+        latest_source_change, self.source_files = includescanner.find_last_time_modified(self.source)
+
+        for s in self.source_files:
+            print s
+
 
         if self.compiler:
             compiler_to_use = self.compiler  # uses the plugin-defined compiler
@@ -163,9 +170,8 @@ class PackageContainer:
 
         plugin_dir = os.path.join(package_dir, self.plugin_out)
 
-        source_dir = os.path.join(plugin_dir, '..', 'scripting')
-        source_dir = os.path.abspath(source_dir)
-        util.mkdir(source_dir)
+        output_source_dir = os.path.join(plugin_dir, '..', 'scripting')
+        util.mkdir(output_source_dir)
 
         for p in self.plugins:
             if p not in Plugins:
@@ -174,8 +180,11 @@ class PackageContainer:
             util.mkdir(plugin_dir)
             binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
             shutil.copy2(binary_path, plugin_dir)
-            # TODO: a serious problem is that included files are not also copied over
-            shutil.copy2(Plugins[p].source, source_dir)
+            for source_file in Plugins[p].source_files:
+                source_path = os.path.join(Plugins[p].source_dir, source_file)
+                output_file_path = os.path.join(output_source_dir, source_file)
+                util.mkdir(os.path.dirname(output_file_path))
+                shutil.copyfile(source_path, output_file_path)
 
         for filegroup in self.filegroups:
             filegroup_out_dir = os.path.join(package_dir, filegroup)
