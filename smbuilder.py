@@ -45,7 +45,7 @@ def execute_config(dir_path):
 
 
 def register_include(path):
-    global DirectoryStack
+    global DirectoryStack, InsideInclude
     DirectoryStack.append(path)
     execute_config(os.path.join(*DirectoryStack))
     DirectoryStack.pop()
@@ -74,6 +74,7 @@ class PluginContainer:
         self.config_source = config_source
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
         self.source_files = set()
+        self.smbuildfile = os.path.join(*DirectoryStack)
 
     def compile(self, compiler, output_dir):
         active_path = os.path.join(*DirectoryStack)
@@ -113,13 +114,15 @@ def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugi
             new_list = []
             current_path = os.path.join(*DirectoryStack)
             for pattern in filegroups[dir]:
-                for f in glob.glob(os.path.join(current_path, pattern)):
-                    new_list.append(os.path.abspath(f))
+                matches = glob.glob(os.path.join(current_path, pattern))
+                if not matches:
+                    util.warning('No matches found for pattern \'{}\' in package \'{}\''.format(pattern, name))
+                else:
+                    for f in matches:
+                        new_list.append(os.path.abspath(f))
 
             filegroups[dir] = new_list
 
-                # filegroups[dir] = os.path.abspath(os.path.jo)
-            # filegroups[dir] = map(lambda f: os.path.abspath(os.path.join(current_path, f)), filegroups[dir])
     else:
         filegroups = {}
 
@@ -139,6 +142,7 @@ class PackageContainer:
         self.plugin_out = plugin_out
         self.filegroups = filegroups
         self.extends_list = extends_list
+        self.smbuildfile = os.path.join(*DirectoryStack)
 
     def create(self, output_dir):
         global Plugins
