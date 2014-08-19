@@ -26,6 +26,3 @@ PATH+=":/home/splewis/git/sm-builder"``)
 Some examples are my sourcemod plugin projects:
 - https://github.com/splewis/csgo-pug-setup/blob/master/smbuild
 - https://github.com/splewis/smart-player-reports/blob/master/smbuild
-
-
-

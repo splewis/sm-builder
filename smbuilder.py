@@ -19,7 +19,7 @@ DirectoryStack = []
 Plugins = {}
 Packages = {}
 
-OUTPUT_DIR = 'smbuilds'
+OUTPUT_DIR = 'builds'
 CONFIG_NAME = 'smbuild'
 
 
@@ -63,15 +63,15 @@ def register_plugin(name=None, source=None, compiler=None):
     current_path = os.path.join(*DirectoryStack)
     source_path = os.path.join(current_path, source)
 
-    Plugins[name] = PluginContainer(name, source_path, compiler)
+    Plugins[name] = PluginContainer(name, source_path, compiler, current_path)
 
 
 class PluginContainer:
-    def __init__(self, name, source, compiler):
+    def __init__(self, name, source, compiler, config_source):
         self.name = name
         self.source = os.path.abspath(source)
         self.compiler = compiler
-        self.included_source = []
+        self.config_source = self.config_source
 
     def compile(self, compiler, output_dir):
         latest_source_change = includescanner.find_last_time_modified(self.source)

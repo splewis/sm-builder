@@ -5,9 +5,10 @@ def warning(text):
     print(bcolors.WARNING + 'WARNING: ' + bcolors.ENDC + text)
 
 
-def error(text):
+def error(text, die=True):
     print(bcolors.FAIL + 'ERROR: ' + bcolors.ENDC + text)
-    exit(1)
+    if die:
+        exit(1)
 
 
 def mkdir(*args):
