@@ -9,6 +9,6 @@ Package(
 	name = 'test_package',
 	plugins = ['test_plugin', 'test_plugin2'],
 	filegroups = {
-		'cfg': ['server.cfg'],
+		'cfg': ['*.cfg'],
 	},
 )

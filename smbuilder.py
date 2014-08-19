@@ -107,8 +107,16 @@ def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugi
 
     if filegroups:
         for dir in filegroups:
+            new_list = []
             current_path = os.path.join(*DirectoryStack)
-            filegroups[dir] = map(lambda f: os.path.abspath(os.path.join(current_path, f)), filegroups[dir])
+            for pattern in filegroups[dir]:
+                for f in glob.glob(os.path.join(current_path, pattern)):
+                    new_list.append(os.path.abspath(f))
+
+            filegroups[dir] = new_list
+
+                # filegroups[dir] = os.path.abspath(os.path.jo)
+            # filegroups[dir] = map(lambda f: os.path.abspath(os.path.join(current_path, f)), filegroups[dir])
     else:
         filegroups = {}
 
