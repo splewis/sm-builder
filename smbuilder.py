@@ -79,10 +79,6 @@ class PluginContainer:
         active_path = os.path.join(*DirectoryStack)
         latest_source_change, self.source_files = includescanner.find_last_time_modified(self.source)
 
-        for s in self.source_files:
-            print s
-
-
         if self.compiler:
             compiler_to_use = self.compiler  # uses the plugin-defined compiler
         else:
