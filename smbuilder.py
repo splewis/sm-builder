@@ -75,7 +75,7 @@ class PluginContainer:
         self.config_source = config_source
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
         self.source_files = set()
-        self.smbuildfile = os.path.join(*DirectoryStack)
+        self.smbuildfile = os.path.join(os.path.join(*DirectoryStack), CONFIG_NAME)
 
     def compile(self, compiler, output_dir):
         active_path = os.path.join(*DirectoryStack)
@@ -94,10 +94,12 @@ class PluginContainer:
         if latest_source_change > latest_binary_change:
             cmd = '{0} {1} -o={2}'.format(compiler_to_use, self.source, os.path.join(output_dir, self.name))
             try:
-                subprocess.check_call(cmd, shell=True)
+                print(cmd)
+                output = subprocess.check_output(cmd, shell=True)
+                print(output)
                 return True
             except subprocess.CalledProcessError:
-                util.error('Failed to compile {}'.format(self.name))
+                util.error('Failed to compile {}, from {}'.format(self.name, smbuildfile))
         else:
             return False
 
@@ -117,7 +119,7 @@ def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugi
             for pattern in filegroups[dir]:
                 matches = glob.glob(os.path.join(current_path, pattern))
                 if not matches:
-                    util.warning('No matches found for pattern \'{}\' in package \'{}\''.format(pattern, name))
+                    util.warning('No matches found for pattern \'{}\' in package \'{}\', from {}'.format(pattern, name))
                 else:
                     for f in matches:
                         new_list.append(os.path.abspath(f))
@@ -202,13 +204,14 @@ def main():
     args = parser.parse_args()
 
     if args.clean:
-        shutil.rmtree(OUTPUT_DIR)
+        clean()
     else:
         perform_builds(args.config, args.compiler)
 
 
 def clean():
-    shutil.rmtree(OUTPUT_DIR)
+    if os.path.exists(OUTPUT_DIR):
+        shutil.rmtree(OUTPUT_DIR)
 
 
 def perform_builds(config, compiler):
