@@ -31,15 +31,16 @@ def glob_plugins(pattern):
 
 
 def execute_config(dir_path):
-    f = os.path.abspath(os.path.join(dir_path, CONFIG_NAME))
-    if os.path.exists(f):
+    filename = os.path.abspath(os.path.join(dir_path, CONFIG_NAME))
+    if os.path.exists(filename):
         context = {
             'Include': register_include,
             'Plugin': register_plugin,
             'Package': register_package,
             'GlobPlugins': glob_plugins,
         }
-        execfile(f, context)
+        with open(filename) as f:
+            exec(f.read(), context)
     else:
         util.error('Config file does not exist: {}'.format(f))
 
@@ -221,11 +222,11 @@ def perform_builds(config, compiler):
     execute_config(config)
 
     compiled_count = 0
-    for name, plugin in Plugins.iteritems():
+    for name, plugin in Plugins.items():
         if plugin.compile(compiler, plugin_build_dir):
             compiled_count += 1
 
-    for name, package in Packages.iteritems():
+    for name, package in Packages.items():
         package.create(OUTPUT_DIR)
 
     if len(Plugins) == 0:
