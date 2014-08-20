@@ -93,13 +93,13 @@ class PluginContainer:
 
         if latest_source_change > latest_binary_change:
             cmd = '{0} {1} -o={2}'.format(compiler_to_use, self.source, os.path.join(output_dir, self.name))
+            output = ''
             try:
                 print(cmd)
-                output = subprocess.check_output(cmd, shell=True)
-                print(output)
+                subprocess.check_call(cmd, shell=True, stderr=subprocess.STDOUT)
                 return True
             except subprocess.CalledProcessError:
-                util.error('Failed to compile {}, from {}'.format(self.name, smbuildfile))
+                util.error('Failed to compile {}, from {}'.format(self.name, self.smbuildfile))
         else:
             return False
 
@@ -145,7 +145,7 @@ class PackageContainer:
         self.plugin_out = plugin_out
         self.filegroups = filegroups
         self.extends_list = extends_list
-        self.smbuildfile = os.path.join(*DirectoryStack)
+        self.smbuildfile = os.path.relpath(os.path.join(*DirectoryStack))
 
     def create(self, output_dir):
         global Plugins
