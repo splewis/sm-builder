@@ -187,91 +187,87 @@ class PackageContainer:
     def create(self, output_dir):
         global Plugins
 
-        for base_name in self.extends_list:
-            try:
-                base = Packages[base_name]
-            except KeyError:
-                err_msg = 'Package {} extends non-existent package {}'
-                util.error(err_msg.format(self.name, base_name))
-
-            self.plugins += base.plugins
-            for path, files in base.filegroups.iteritems():
-                if path not in self.filegroups:
-                    self.filegroups[path] = []
-                for f in files:
-                    # don't allow a base package to overwrite, use the 'lower'
-                    # file
-                    if not f in self.filegroups[path]:
-                        self.filegroups[path].append(f)
-
-        package_dir = os.path.join(output_dir, self.name)
-
         # clears out the package
+        package_dir = os.path.join(OUTPUT_DIR, self.name)
         if os.path.exists(package_dir):
             shutil.rmtree(package_dir)
         util.mkdir(package_dir)
 
-        cfg_dir = os.path.join(package_dir, 'cfg')
-        sm_dir = os.path.join(package_dir, 'addons', 'sourcemod')
-        plugin_dir = os.path.join(sm_dir, 'plugins')
-        config_dir = os.path.join(sm_dir, 'configs')
-        translation_dir = os.path.join(sm_dir, 'translations')
-        data_dir = os.path.join(sm_dir, 'data')
+        for base_name in self.extends_list:
+            try:
+                base = Packages[base_name]
+                build_package(base, self.name)
+            except KeyError:
+                err_msg = 'Package {} extends non-existent package {}'
+                util.error(err_msg.format(self.name, base_name))
 
-        output_source_dir = os.path.join(plugin_dir, '..', 'scripting')
-        util.mkdir(output_source_dir)
+        build_package(self, self.name)
 
-        for p in self.plugins:
-            if p not in Plugins:
-                err_msg = 'Package {} used non-existent plugin {}'
-                util.error(err_msg.format(self.name, p))
 
-            util.mkdir(plugin_dir)
-            binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
-            shutil.copy2(binary_path, plugin_dir)
-            for source_file in Plugins[p].source_files:
-                source_path = os.path.join(Plugins[p].source_dir, source_file)
-                output_file_path = os.path.join(output_source_dir, source_file)
-                util.mkdir(os.path.dirname(output_file_path))
-                shutil.copyfile(source_path, output_file_path)
+def build_package(package, name):
+    package_dir = os.path.join(OUTPUT_DIR, name)
 
-        for filegroup in self.filegroups:
-            filegroup_out_dir = os.path.join(package_dir, filegroup)
-            util.mkdir(filegroup_out_dir)
-            for f in self.filegroups[filegroup]:
-                if os.path.isdir(f):
-                    util.error(
-                        'Only files may be put in filegroups: {}'.format(f))
-                shutil.copy2(f, filegroup_out_dir)
+    cfg_dir = os.path.join(package_dir, 'cfg')
+    sm_dir = os.path.join(package_dir, 'addons', 'sourcemod')
+    plugin_dir = os.path.join(sm_dir, 'plugins')
+    config_dir = os.path.join(sm_dir, 'configs')
+    translation_dir = os.path.join(sm_dir, 'translations')
+    data_dir = os.path.join(sm_dir, 'data')
 
-        copy_package_files(self.configs, config_dir)
-        copy_package_files(self.translations, translation_dir)
-        copy_package_files(self.data, data_dir)
-        copy_package_files(self.cfgs, cfg_dir)
+    output_source_dir = os.path.join(plugin_dir, '..', 'scripting')
+    util.mkdir(output_source_dir)
+
+    for p in package.plugins:
+        if p not in Plugins:
+            err_msg = 'Package {} used non-existent plugin {}'
+            util.error(err_msg.format(package.name, p))
+
+        util.mkdir(plugin_dir)
+        binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
+        shutil.copy2(binary_path, plugin_dir)
+        for source_file in Plugins[p].source_files:
+            source_path = os.path.join(Plugins[p].source_dir, source_file)
+            output_file_path = os.path.join(output_source_dir, source_file)
+            util.mkdir(os.path.dirname(output_file_path))
+            shutil.copyfile(source_path, output_file_path)
+
+    for filegroup in package.filegroups:
+        filegroup_out_dir = os.path.join(package_dir, filegroup)
+        util.mkdir(filegroup_out_dir)
+        for f in package.filegroups[filegroup]:
+            if os.path.isdir(f):
+                util.error(
+                    'Only files may be put in filegroups: {}'.format(f))
+            shutil.copy2(f, filegroup_out_dir)
+
+    copy_package_files(package.configs, config_dir)
+    copy_package_files(package.translations, translation_dir)
+    copy_package_files(package.data, data_dir)
+    copy_package_files(package.cfgs, cfg_dir)
+
 
 
 def copy_package_files(list, dir):
     for f in list:
         if os.path.isdir(f):
-            shutil.copytree(f, dir)
+            util.copytree(f, dir)
         else:
             shutil.copy2(f, dir)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='A sourcemod build and packaging tool')
-    parser.add_argument('-cfg', '--config', default='.',
-                        help='Directory to read a smbuild config file from')
+        description='A sourcemod build and packaging tool.')
+    parser.add_argument('target', nargs='?')
     parser.add_argument('-c', '--compiler', default='spcomp',
-                        help='Sourcepawn compiler to use')
-    parser.add_argument('--clean', action='store_true')
+                        help='Sourcepawn compiler to use.')
     args = parser.parse_args()
 
-    if args.clean:
-        clean()
-    else:
-        perform_builds(args.config, args.compiler)
+    # default to building all targets in current directory
+    if not args.target:
+        args.target =':all'
+
+    perform_builds(args.target, args.compiler)
 
 
 def clean():
@@ -279,15 +275,27 @@ def clean():
         shutil.rmtree(OUTPUT_DIR)
 
 
-def perform_builds(config, compiler):
+def perform_builds(target, compiler):
     global DirectoryStack, Plugins
+
+    if target == 'clean':
+        clean()
+        return
 
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
 
+    try:
+        config_dir = target[:target.index(':')]
+        if config_dir == '':
+            config_dir = '.'
+        target_name = target[target.index(':')+1:]
+    except ValueError:
+        util.error('Got bad target name: {}'.format(target))
+
     util.mkdir(OUTPUT_DIR)
     util.mkdir(plugin_build_dir)
-    DirectoryStack = [config]
-    execute_config(config)
+    DirectoryStack = [config_dir]
+    execute_config(config_dir)
 
     compiled_count = 0
     for name, plugin in Plugins.items():
@@ -295,11 +303,16 @@ def perform_builds(config, compiler):
             compiled_count += 1
 
     for name, package in Packages.items():
-        package.create(OUTPUT_DIR)
+        # when checking the 'all' filter, we're only building the packages
+        # that came from this file
+        from_this_config = (config_dir == package.smbuildfile)
+        if name == target_name or (target_name == 'all' and from_this_config):
+            print('Building package {}'.format(name))
+            package.create(OUTPUT_DIR)
 
     if len(Plugins) == 0:
         util.warning('No plugins were found in {}.'.format(
-            os.path.join(config, CONFIG_NAME)))
+            os.path.join(config_dir, CONFIG_NAME)))
     elif compiled_count == 0:
         print('All plugins up to date.')
 
