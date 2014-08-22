@@ -9,6 +9,7 @@ General philosophy:
 - Allows custom rules
 - Simple configuration syntax
 - User friendly (especially when presenting errors - no python stack traces!)
+- Useful to both public-plugin developers and server administrators
 
 
 ### Installation
@@ -21,8 +22,11 @@ PATH+=":/home/splewis/git/sm-builder"``)
 
 - You're done! You can now invoke ``smbuilder`` on the command line. Note that smbuilder is just a symlink to smbuilder.py.
 
+Windows support **may** come later. It shouldn't take much to get it to work, but there may be small issues to work out before I can claim it works on windows.
+
 
 ### Examples
 Some examples are my sourcemod plugin projects:
+- https://github.com/splewis/csgo-multi-1v1/blob/master/smbuild
 - https://github.com/splewis/csgo-pug-setup/blob/master/smbuild
 - https://github.com/splewis/smart-player-reports/blob/master/smbuild

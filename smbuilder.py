@@ -40,7 +40,11 @@ def execute_config(dir_path):
             'GlobPlugins': glob_plugins,
         }
         with open(filename) as f:
-            exec(f.read(), context)
+            try:
+                exec(f.read(), context)
+            except Exception as e:
+                util.error(
+                    'There is a syntax error in {}\n{}'.format(filename, e))
     else:
         util.error('Config file does not exist: {}'.format(filename))
 
@@ -68,6 +72,7 @@ def register_plugin(name=None, source=None, compiler=None):
 
 
 class PluginContainer:
+
     def __init__(self, name, source, compiler, config_source):
         self.name = name
         self.source = source
@@ -75,11 +80,12 @@ class PluginContainer:
         self.config_source = config_source
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
         self.source_files = set()
-        self.smbuildfile = os.path.join(os.path.join(*DirectoryStack), CONFIG_NAME)
+        self.smbuildfile = os.path.join(
+            os.path.join(*DirectoryStack), CONFIG_NAME)
 
     def compile(self, compiler, output_dir):
-        active_path = os.path.join(*DirectoryStack)
-        latest_source_change, self.source_files = includescanner.find_last_time_modified(self.source)
+        latest_source_change, self.source_files = (
+            includescanner.find_last_time_modified(self.source))
 
         if self.compiler:
             compiler_to_use = self.compiler  # uses the plugin-defined compiler
@@ -92,20 +98,24 @@ class PluginContainer:
             latest_binary_change = os.path.getmtime(binary_file_name)
 
         if latest_source_change > latest_binary_change:
-            cmd = '{0} {1} -o={2}'.format(compiler_to_use, self.source, os.path.join(output_dir, self.name))
-            output = ''
+            cmd = '{0} {1} -o={2}'.format(compiler_to_use,
+                                          self.source,
+                                          os.path.join(output_dir, self.name))
             try:
                 print(cmd)
-                subprocess.check_call(cmd, shell=True, stderr=subprocess.STDOUT)
+                subprocess.check_call(
+                    cmd, shell=True, stderr=subprocess.STDOUT)
                 return True
             except subprocess.CalledProcessError:
-                util.error('Failed to compile {}, from {}'.format(self.name, self.smbuildfile))
+                err_msg = 'Failed to compile {}, from {}'
+                util.error(err_msg.format(self.name, self.smbuildfile))
         else:
             return False
 
 
 def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
-                     extends=None, configs=['configs'], translations=['translations'], data=['data']):
+                     extends=None, configs=['configs'],
+                     translations=['translations'], data=['data']):
     if not name:
         util.error('Packages must specify a name')
     if name in Packages:
@@ -144,7 +154,8 @@ def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
     else:
         data = []
 
-    Packages[name] = PackageContainer(name, plugins, filegroups, extends, cfgs, configs, translations, data)
+    Packages[name] = PackageContainer(
+        name, plugins, filegroups, extends, cfgs, configs, translations, data)
 
 
 def glob_files(file_list, name):
@@ -160,7 +171,9 @@ def glob_files(file_list, name):
 
 
 class PackageContainer:
-    def __init__(self, name, plugins, filegroups, extends_list, cfgs, configs, translations, data):
+
+    def __init__(self, name, plugins, filegroups, extends_list, cfgs, configs,
+                 translations, data):
         self.name = name
         self.plugins = plugins
         self.filegroups = filegroups
@@ -178,14 +191,16 @@ class PackageContainer:
             try:
                 base = Packages[base_name]
             except KeyError:
-                util.error('Package {} extends non-existent package {}'.format(self.name, base_name))
+                err_msg = 'Package {} extends non-existent package {}'
+                util.error(err_msg.format(self.name, base_name))
 
             self.plugins += base.plugins
             for path, files in base.filegroups.iteritems():
                 if path not in self.filegroups:
                     self.filegroups[path] = []
                 for f in files:
-                    # don't allow a base package to overwrite, use the 'lower' file
+                    # don't allow a base package to overwrite, use the 'lower'
+                    # file
                     if not f in self.filegroups[path]:
                         self.filegroups[path].append(f)
 
@@ -208,7 +223,8 @@ class PackageContainer:
 
         for p in self.plugins:
             if p not in Plugins:
-                util.error('Package {} used non-existent plugin {}'.format(self.name, p))
+                err_msg = 'Package {} used non-existent plugin {}'
+                util.error(err_msg.format(self.name, p))
 
             util.mkdir(plugin_dir)
             binary_path = os.path.join(OUTPUT_DIR, 'plugins', p + '.smx')
@@ -224,7 +240,8 @@ class PackageContainer:
             util.mkdir(filegroup_out_dir)
             for f in self.filegroups[filegroup]:
                 if os.path.isdir(f):
-                    util.error('Only files may be put in filegroups: {}'.format(f))
+                    util.error(
+                        'Only files may be put in filegroups: {}'.format(f))
                 shutil.copy2(f, filegroup_out_dir)
 
         copy_package_files(self.configs, config_dir)
@@ -241,11 +258,13 @@ def copy_package_files(list, dir):
             shutil.copy2(f, dir)
 
 
-
 def main():
-    parser = argparse.ArgumentParser(description='smbuild is a build and packaging tool for managing sourcemod plugins and servers')
-    parser.add_argument('-cfg', '--config', default='.', help='Directory to read a smbuild config file from')
-    parser.add_argument('-c', '--compiler', default='spcomp', help='Sourcepawn compiler to use, this is executed directly by a shell')
+    parser = argparse.ArgumentParser(
+        description='A sourcemod build and packaging tool')
+    parser.add_argument('-cfg', '--config', default='.',
+                        help='Directory to read a smbuild config file from')
+    parser.add_argument('-c', '--compiler', default='spcomp',
+                        help='Sourcepawn compiler to use')
     parser.add_argument('--clean', action='store_true')
     args = parser.parse_args()
 
@@ -279,7 +298,8 @@ def perform_builds(config, compiler):
         package.create(OUTPUT_DIR)
 
     if len(Plugins) == 0:
-        util.warning('No plugins were found in {}.'.format(os.path.join(config, CONFIG_NAME)))
+        util.warning('No plugins were found in {}.'.format(
+            os.path.join(config, CONFIG_NAME)))
     elif compiled_count == 0:
         print('All plugins up to date.')
 
