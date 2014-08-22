@@ -27,7 +27,7 @@ def glob_plugins(pattern):
     path = os.path.join(*DirectoryStack)
     results = glob.glob(os.path.join(path, pattern))
     for source_file in results:
-        register_plugin(source=os.path.abspath(source_file))
+        register_plugin(source=source_file)
 
 
 def execute_config(dir_path):
@@ -42,7 +42,7 @@ def execute_config(dir_path):
         with open(filename) as f:
             exec(f.read(), context)
     else:
-        util.error('Config file does not exist: {}'.format(f))
+        util.error('Config file does not exist: {}'.format(filename))
 
 
 def register_include(path):
@@ -104,7 +104,8 @@ class PluginContainer:
             return False
 
 
-def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugins', filegroups=None, extends=None):
+def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
+                     extends=None, configs=['configs'], translations=['translations'], data=['data']):
     if not name:
         util.error('Packages must specify a name')
     if name in Packages:
@@ -114,37 +115,60 @@ def register_package(name=None, plugins=None, plugin_out='addons/sourcemod/plugi
 
     if filegroups:
         for dir in filegroups:
-            new_list = []
-            current_path = os.path.join(*DirectoryStack)
-            for pattern in filegroups[dir]:
-                matches = glob.glob(os.path.join(current_path, pattern))
-                if not matches:
-                    util.warning('No matches found for pattern \'{}\' in package \'{}\', from {}'.format(pattern, name))
-                else:
-                    for f in matches:
-                        new_list.append(os.path.abspath(f))
-
-            filegroups[dir] = new_list
-
+            filegroups[dir] = glob_files(filegroups[dir], name)
     else:
         filegroups = {}
 
     if not plugins:
         plugins = []
-
     if not extends:
         extends = []
 
-    Packages[name] = PackageContainer(name, plugins, plugin_out, filegroups, extends)
+    if cfgs:
+        cfgs = glob_files(cfgs, name)
+    else:
+        cfgs = []
+
+    if configs:
+        configs = glob_files(configs, name)
+    else:
+        configs = []
+
+    if translations:
+        translations = glob_files(translations, name)
+    else:
+        translations = []
+
+    if data:
+        data = glob_files(data, name)
+    else:
+        data = []
+
+    Packages[name] = PackageContainer(name, plugins, filegroups, extends, cfgs, configs, translations, data)
+
+
+def glob_files(file_list, name):
+    output = []
+    current_path = os.path.join(*DirectoryStack)
+    for pattern in file_list:
+        matches = glob.glob(os.path.join(current_path, pattern))
+        if matches:
+            for f in matches:
+                output.append(f)
+
+    return output
 
 
 class PackageContainer:
-    def __init__(self, name, plugins, plugin_out, filegroups, extends_list):
+    def __init__(self, name, plugins, filegroups, extends_list, cfgs, configs, translations, data):
         self.name = name
         self.plugins = plugins
-        self.plugin_out = plugin_out
         self.filegroups = filegroups
         self.extends_list = extends_list
+        self.cfgs = cfgs
+        self.configs = configs
+        self.translations = translations
+        self.data = data
         self.smbuildfile = os.path.relpath(os.path.join(*DirectoryStack))
 
     def create(self, output_dir):
@@ -166,12 +190,18 @@ class PackageContainer:
                         self.filegroups[path].append(f)
 
         package_dir = os.path.join(output_dir, self.name)
+
         # clears out the package
         if os.path.exists(package_dir):
             shutil.rmtree(package_dir)
         util.mkdir(package_dir)
 
-        plugin_dir = os.path.join(package_dir, self.plugin_out)
+        cfg_dir = os.path.join(package_dir, 'cfg')
+        sm_dir = os.path.join(package_dir, 'addons', 'sourcemod')
+        plugin_dir = os.path.join(sm_dir, 'plugins')
+        config_dir = os.path.join(sm_dir, 'configs')
+        translation_dir = os.path.join(sm_dir, 'translations')
+        data_dir = os.path.join(sm_dir, 'data')
 
         output_source_dir = os.path.join(plugin_dir, '..', 'scripting')
         util.mkdir(output_source_dir)
@@ -193,7 +223,23 @@ class PackageContainer:
             filegroup_out_dir = os.path.join(package_dir, filegroup)
             util.mkdir(filegroup_out_dir)
             for f in self.filegroups[filegroup]:
+                if os.path.isdir(f):
+                    util.error('Only files may be put in filegroups: {}'.format(f))
                 shutil.copy2(f, filegroup_out_dir)
+
+        copy_package_files(self.configs, config_dir)
+        copy_package_files(self.translations, translation_dir)
+        copy_package_files(self.data, data_dir)
+        copy_package_files(self.cfgs, cfg_dir)
+
+
+def copy_package_files(list, dir):
+    for f in list:
+        if os.path.isdir(f):
+            shutil.copytree(f, dir)
+        else:
+            shutil.copy2(f, dir)
+
 
 
 def main():
