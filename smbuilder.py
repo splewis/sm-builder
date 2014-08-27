@@ -114,7 +114,7 @@ class PluginContainer:
 
 
 def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
-                     extends=None, configs=['configs'],
+                     extends=None, configs=['configs'], gamedata=['gamedata'],
                      translations=['translations'], data=['data']):
     if not name:
         util.error('Packages must specify a name')
@@ -149,13 +149,18 @@ def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
     else:
         translations = []
 
+    if gamedata:
+        gamedata = glob_files(gamedata, name)
+    else:
+        gamedata = []
+
     if data:
         data = glob_files(data, name)
     else:
         data = []
 
     Packages[name] = PackageContainer(
-        name, plugins, filegroups, extends, cfgs, configs, translations, data)
+        name, plugins, filegroups, extends, cfgs, configs, translations, data, gamedata)
 
 
 def glob_files(file_list, name):
@@ -173,7 +178,7 @@ def glob_files(file_list, name):
 class PackageContainer:
 
     def __init__(self, name, plugins, filegroups, extends_list, cfgs, configs,
-                 translations, data):
+                 translations, data, gamedata):
         self.name = name
         self.plugins = plugins
         self.filegroups = filegroups
@@ -182,6 +187,7 @@ class PackageContainer:
         self.configs = configs
         self.translations = translations
         self.data = data
+        self.gamedata = gamedata
         self.smbuildfile = os.path.relpath(os.path.join(*DirectoryStack))
 
     def create(self, output_dir):
@@ -192,19 +198,17 @@ class PackageContainer:
         if os.path.exists(package_dir):
             shutil.rmtree(package_dir)
         util.mkdir(package_dir)
-
-        for base_name in self.extends_list:
-            try:
-                base = Packages[base_name]
-                build_package(base, self.name)
-            except KeyError:
-                err_msg = 'Package {} extends non-existent package {}'
-                util.error(err_msg.format(self.name, base_name))
-
         build_package(self, self.name)
 
 
 def build_package(package, name):
+    for p in package.extends_list:
+        try:
+            build_package(Packages[p], name)
+        except KeyError:
+            err_msg = 'Package {} extends non-existent package {}'
+            util.error(err_msg.format(package.name, p))
+
     package_dir = os.path.join(OUTPUT_DIR, name)
 
     cfg_dir = os.path.join(package_dir, 'cfg')
@@ -213,6 +217,7 @@ def build_package(package, name):
     config_dir = os.path.join(sm_dir, 'configs')
     translation_dir = os.path.join(sm_dir, 'translations')
     data_dir = os.path.join(sm_dir, 'data')
+    gamedata_dir = os.path.join(sm_dir, 'gamedata')
 
     output_source_dir = os.path.join(plugin_dir, '..', 'scripting')
     util.mkdir(output_source_dir)
@@ -242,9 +247,9 @@ def build_package(package, name):
 
     copy_package_files(package.configs, config_dir)
     copy_package_files(package.translations, translation_dir)
-    copy_package_files(package.data, data_dir)
     copy_package_files(package.cfgs, cfg_dir)
-
+    copy_package_files(package.data, data_dir)
+    copy_package_files(package.gamedata, gamedata_dir)
 
 
 def copy_package_files(list, dir):
@@ -292,19 +297,34 @@ def perform_builds(target, compiler):
     except ValueError:
         util.error('Got bad target name: {}'.format(target))
 
+    # setup directory structure, execute user-configurations
     util.mkdir(OUTPUT_DIR)
     util.mkdir(plugin_build_dir)
     DirectoryStack = [config_dir]
     execute_config(config_dir)
 
+    # scan deps for what we need to do
+    packages_to_build = set()
+    for name, package in Packages.iteritems():
+        from_this_config = (config_dir == package.smbuildfile)
+        if name == target_name or (target_name == 'all' and from_this_config):
+            packages_to_build.add(name)
+
+    plugins_to_compile = set()
+    for name in packages_to_build:
+        for dep in util.find_plugins(Packages[name], Packages):
+            plugins_to_compile.add(dep)
+
+    # compile plugins
     compiled_count = 0
-    for name, plugin in Plugins.items():
+    for name in plugins_to_compile:
+        plugin = Plugins[name]
         if plugin.compile(compiler, plugin_build_dir):
             compiled_count += 1
 
-    for name, package in Packages.items():
-        # when checking the 'all' filter, we're only building the packages
-        # that came from this file
+    # build packages
+    for name in packages_to_build:
+        package = Packages[name]
         from_this_config = (config_dir == package.smbuildfile)
         if name == target_name or (target_name == 'all' and from_this_config):
             print('Building package {}'.format(name))
