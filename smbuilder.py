@@ -60,8 +60,7 @@ def register_plugin(name=None, source=None, compiler=None):
     if not source:
         util.error('Plugins must specify a source')
     if not name:
-        name = os.path.basename(source)  # get file name from the full path
-        name = os.path.splitext(name)[0]  # remove the file extension
+        name = util.file_to_plugin_name(source)
     if name in Plugins:
         util.error('duplicated plugin name {}'.format(name))
 
@@ -113,8 +112,9 @@ class PluginContainer:
             return False
 
 
-def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
-                     extends=None, configs=['configs'], gamedata=['gamedata'],
+def register_package(name=None, plugins=None, filegroups=None, extends=None,
+                     sources=None,
+                     cfgs=['cfg'], configs=['configs'], gamedata=['gamedata'],
                      translations=['translations'], data=['data']):
     if not name:
         util.error('Packages must specify a name')
@@ -133,6 +133,12 @@ def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
         plugins = []
     if not extends:
         extends = []
+    if not sources:
+        sources = []
+    else:
+        for s in sources:
+            register_plugin(source=s)
+            plugins.append(util.file_to_plugin_name(s))
 
     if cfgs:
         cfgs = glob_files(cfgs, name)
@@ -158,6 +164,7 @@ def register_package(name=None, plugins=None, filegroups=None, cfgs=['cfg'],
         data = glob_files(data, name)
     else:
         data = []
+
 
     Packages[name] = PackageContainer(
         name, plugins, filegroups, extends, cfgs, configs, translations, data, gamedata)

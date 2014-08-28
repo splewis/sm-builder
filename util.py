@@ -45,6 +45,11 @@ def find_plugins(package, Packages):
     return plugins
 
 
+def file_to_plugin_name(filename):
+    plugin_name = os.path.basename(filename)
+    return os.path.splitext(plugin_name)[0]
+
+
 # Taken from http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
 class bcolors:
     HEADER = '\033[95m'
