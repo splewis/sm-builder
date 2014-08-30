@@ -21,8 +21,15 @@ def build(smbuildfile, compiler, plugins, packages):
 
     plugins_to_compile = set()
     for name in packages_to_build:
-        for dep in find_plugin_deps(packages[name], packages):
-            plugins_to_compile.add(dep)
+        for_this_package = find_plugin_deps(packages[name], packages)
+        for plugin_name in for_this_package:
+            plugins_to_compile.add(plugin_name)
+
+            # also make sure plugin dependencies are met by the package
+            for dep in plugins[plugin_name].deps:
+                if dep not in for_this_package:
+                    msg = 'Plugin {} depends on {}, but is not part of package {}'.format(plugin_name, dep, name)
+                    util.warning(msg)
 
     # compile plugins
     compiled_count = 0

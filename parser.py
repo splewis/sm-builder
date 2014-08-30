@@ -54,7 +54,7 @@ def register_include(path):
     DirectoryStack.pop()
 
 
-def register_plugin(name=None, source=None, compiler=None):
+def register_plugin(name=None, source=None, compiler=None, deps=None):
     if not source:
         util.error('Plugins must specify a source')
     if not name:
@@ -66,7 +66,10 @@ def register_plugin(name=None, source=None, compiler=None):
     source_path = os.path.join(current_path, source)
     smbuildfile = os.path.join(current_path, CONFIG_NAME)
 
-    Plugins[name] = base.PluginContainer(name, source_path, compiler, smbuildfile)
+    if deps is None:
+        deps = []
+
+    Plugins[name] = base.PluginContainer(name, source_path, compiler, smbuildfile, deps)
 
 
 def register_package(name=None, plugins=None, filegroups=None, extends=None,

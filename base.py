@@ -8,11 +8,12 @@ import shutil
 
 class PluginContainer:
     """Wrapper that represents a single sourcemod plugin."""
-    def __init__(self, name, source, compiler, smbuildfile):
+    def __init__(self, name, source, compiler, smbuildfile, deps):
         self.name = name
         self.source = source
         self.compiler = compiler
         self.smbuildfile = smbuildfile
+        self.deps = deps
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
         self.source_files = set()
 
