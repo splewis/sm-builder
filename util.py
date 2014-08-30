@@ -36,13 +36,12 @@ def copytree(src, dst, symlinks=False, ignore=None):
                 shutil.copy2(s, d)
 
 
-def find_plugins(package, Packages):
-    plugins = set()
-    for p in package.plugins:
-        plugins.add(p)
-    for p in package.extends_list:
-        plugins.update(find_plugins(Packages[p], Packages))
-    return plugins
+def copy_package_files(list, dir):
+    for f in list:
+        if os.path.isdir(f):
+            copytree(f, dir)
+        else:
+            shutil.copy2(f, dir)
 
 
 def file_to_plugin_name(filename):

@@ -1,11 +1,22 @@
-import unittest
+import base
+import builder
+import parser
 import smbuilder
 
+import unittest
 
-# TODO: add some actual test cases!
-class SMBuilderTests(unittest.TestCase):
+
+class BuilderTests(unittest.TestCase):
+    pass
+
+
+class ParserTests(unittest.TestCase):
+    pass
+
+
+class OverallTests(unittest.TestCase):
     def test_overall(self):
-        smbuilder.perform_builds('test:all', 'spcomp')
+        smbuilder.perform_builds('test', 'spcomp')
 
 
 if __name__ == "__main__":

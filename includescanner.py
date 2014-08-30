@@ -11,6 +11,7 @@ def find_last_time_modified(filename):
     visited = map(lambda f: os.path.relpath(f, base), visited)
     return time, visited
 
+
 def _find_last_time_modified(filename, visited):
     try:
         latest_time = os.path.getmtime(filename)
