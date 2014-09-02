@@ -39,12 +39,11 @@ def execute_config(dir_path):
             'GlobPlugins': glob_plugins,
         }
         with open(filename) as f:
-            exec(f.read(), context)
-            # try:
-            #     exec(f.read(), context)
-            # except Exception as e:
-            #     util.error(
-            #         'There is a syntax error in {}\n{}'.format(filename, e))
+            try:
+                exec(f.read(), context)
+            except Exception as e:
+                util.error(
+                    'There is a syntax error in {}\n{}'.format(filename, e))
     else:
         util.error('Config file does not exist: {}'.format(filename))
 

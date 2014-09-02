@@ -52,9 +52,9 @@ def build(smbuildfile, compiler, plugins, packages):
 
 
 def find_plugin_deps(package, packages_dict):
-        plugins = set()
-        for p in package.plugins:
-            plugins.add(p)
-        for p in package.extends_list:
-            plugins.update(find_plugin_deps(packages_dict[p], packages_dict))
-        return plugins
+    plugins = set()
+    for p in package.plugins:
+        plugins.add(p)
+    for p in package.extends_list:
+        plugins.update(find_plugin_deps(packages_dict[p], packages_dict))
+    return plugins
