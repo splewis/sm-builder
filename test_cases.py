@@ -12,6 +12,7 @@ class BuilderTests(unittest.TestCase):
         def fake_package(name, plugins):
             return base.PackageContainer(name, plugins, {}, [], [], [], [], [], [], '')
 
+        # TODO: this should really test package inheritance too
         p1 = fake_package('p1', ['plugin1', 'plugin2', 'plugin3'])
         p2 = fake_package('p2', ['plugin1', 'plugin4', 'plugin3'])
         packages = {
