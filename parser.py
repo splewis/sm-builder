@@ -6,13 +6,15 @@ import glob
 
 
 CONFIG_NAME = 'smbuild'
+IncludedPaths = set()
 Packages = {}
 Plugins = {}
 DirectoryStack = []
 
 
 def parse_configs(config_dir):
-    global DirectoryStack, Packages, Plugins
+    global DirectoryStack, Packages, Plugins, IncludedPaths
+    IncludedPaths = set()
     Plugins = {}
     Packages = {}
     DirectoryStack = [config_dir]
@@ -49,9 +51,12 @@ def execute_config(dir_path):
 
 def register_include(path):
     global DirectoryStack
-    DirectoryStack.append(path)
-    execute_config(os.path.join(*DirectoryStack))
-    DirectoryStack.pop()
+    abspath = os.path.abspath(path)
+    if abspath not in IncludedPaths:
+        DirectoryStack.append(path)
+        execute_config(os.path.join(*DirectoryStack))
+        DirectoryStack.pop()
+        IncludedPaths.add(abspath)
 
 
 def register_plugin(name=None, source=None, compiler=None, deps=None):
@@ -85,7 +90,7 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
 
     if filegroups:
         for dir in filegroups:
-            filegroups[dir] = glob_files(filegroups[dir], name)
+            filegroups[dir] = glob_files(filegroups[dir], name, True)
     else:
         filegroups = {}
 
@@ -132,7 +137,7 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
         name, plugins, filegroups, extends, cfgs, configs, translations, data, gamedata, smbuildfile)
 
 
-def glob_files(file_list, name):
+def glob_files(file_list, name, warn_on_empty=False):
     output = []
     current_path = os.path.join(*DirectoryStack)
     for pattern in file_list:
@@ -140,5 +145,7 @@ def glob_files(file_list, name):
         if matches:
             for f in matches:
                 output.append(f)
+        if not matches and warn_on_empty:
+            util.warning('No files matched pattern {}'.format(pattern))
 
     return output
