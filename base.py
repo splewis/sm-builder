@@ -2,8 +2,10 @@ import includescanner
 import util
 
 import os
+import fileinput
 import subprocess
 import shutil
+import glob
 
 
 class PluginContainer:
@@ -50,7 +52,7 @@ class PluginContainer:
 class PackageContainer:
     """Wrapper that represents a package: a collection of plugins and files."""
     def __init__(self, name, plugins, filegroups, extends_list, cfgs, configs,
-                 translations, data, gamedata, smbuildfile):
+                 translations, data, gamedata, smbuildfile, template_files, template_args):
         self.name = name
         self.plugins = plugins
         self.filegroups = filegroups
@@ -61,20 +63,23 @@ class PackageContainer:
         self.data = data
         self.gamedata = gamedata
         self.smbuildfile = smbuildfile
+        self.template_files = template_files
+        self.template_args = template_args
 
-    def create(self, output_dir, plugins, packages):
+    def create(self, output_dir, packages, plugins):
         # clears out the package, then rebuilds it
         package_dir = os.path.join(output_dir, self.name)
         if os.path.exists(package_dir):
             shutil.rmtree(package_dir)
         util.mkdir(package_dir)
         build_package(self, package_dir, packages, plugins)
+        replace_args(self, package_dir, packages)
 
 
-def build_package(package, package_dir, plugins, packages):
+def build_package(package, package_dir, packages=None, plugins=None):
     for p in package.extends_list:
         try:
-            build_package(packages[p], package_dir, plugins, packages)
+            build_package(packages[p], package_dir, packages, plugins)
         except KeyError:
             err_msg = 'Package {} extends non-existent package {}'
             util.error(err_msg.format(package.name, p))
@@ -118,3 +123,38 @@ def build_package(package, package_dir, plugins, packages):
     util.copy_package_files(package.cfgs, cfg_dir)
     util.copy_package_files(package.data, data_dir)
     util.copy_package_files(package.gamedata, gamedata_dir)
+
+
+def replace_args(package, package_dir, packages):
+    template_args = get_template_args(package, packages)
+    print template_args
+
+    for root, dirs, files in os.walk(package_dir):
+        for file in files:
+            path = os.path.join(root, file)
+            # todo: rathern than 'in', there should be regex or glob style matching
+            if any(map(lambda pattern: pattern in path, package.template_files)):
+                # todo: this should really also use context managers (with open(name) as f:)
+                f = open(path, 'r')
+                filedata = f.read()
+                f.close()
+
+                for key in template_args:
+                    newdata = filedata.replace('%' + key + '%', template_args[key])
+
+                f = open(path, 'w')
+                f.write(newdata)
+                f.close()
+
+
+def get_template_args(package, packages):
+    args = {}
+    # get inherited values
+    for base_name in package.extends_list:
+        base = packages[base_name]
+        args.update(get_template_args(base, packages))
+
+    # get values from this package, overwriting old ones
+    for arg in package.template_args:
+        args[arg] = package.template_args[arg]
+    return args

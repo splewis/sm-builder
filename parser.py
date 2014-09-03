@@ -77,9 +77,10 @@ def register_plugin(name=None, source=None, compiler=None, deps=None):
 
 
 def register_package(name=None, plugins=None, filegroups=None, extends=None,
-                     sources=None,
-                     cfgs=['cfg'], configs=['configs'], gamedata=['gamedata'],
-                     translations=['translations'], data=['data']):
+                     sources=None, template_files=None, template_args=None,
+                     cfgs=None, configs=None, gamedata=None,
+                     translations=None, data=None):
+
     if not name:
         util.error('Packages must specify a name')
     if name in Packages:
@@ -129,11 +130,16 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
     else:
         data = []
 
+    if not template_files:
+        template_files = []
+    if not template_args:
+        template_args = {}
+
     current_path = os.path.join(*DirectoryStack)
     smbuildfile = os.path.join(current_path, CONFIG_NAME)
 
     Packages[name] = base.PackageContainer(
-        name, plugins, filegroups, extends, cfgs, configs, translations, data, gamedata, smbuildfile)
+        name, plugins, filegroups, extends, cfgs, configs, translations, data, gamedata, smbuildfile, template_files, template_args)
 
 
 def glob_files(file_list, name, warn_on_empty=False):
