@@ -39,6 +39,7 @@ def execute_config(dir_path):
             'GlobPlugins': glob_plugins,
         }
         with open(filename) as f:
+            exec(f.read(), context)
             try:
                 exec(f.read(), context)
             except Exception as e:
@@ -78,8 +79,8 @@ def register_plugin(name=None, source=None, compiler=None, deps=None):
 
 def register_package(name=None, plugins=None, filegroups=None, extends=None,
                      sources=None, template_files=None, template_args=None,
-                     cfgs=None, configs=None, gamedata=None,
-                     translations=None, data=None):
+                     cfg='cfg', configs='configs', gamedata='gamedata',
+                     translations='translations', data='data'):
 
     if not name:
         util.error('Packages must specify a name')
@@ -98,48 +99,23 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
         plugins = []
     if not extends:
         extends = []
-    if not sources:
-        sources = []
-    else:
-        for s in sources:
-            register_plugin(source=s)
-            plugins.append(util.file_to_plugin_name(s))
-
-    if cfgs:
-        cfgs = glob_files(cfgs, name)
-    else:
-        cfgs = []
-
-    if configs:
-        configs = glob_files(configs, name)
-    else:
-        configs = []
-
-    if translations:
-        translations = glob_files(translations, name)
-    else:
-        translations = []
-
-    if gamedata:
-        gamedata = glob_files(gamedata, name)
-    else:
-        gamedata = []
-
-    if data:
-        data = glob_files(data, name)
-    else:
-        data = []
-
     if not template_files:
         template_files = []
     if not template_args:
         template_args = {}
 
+
+    if sources:
+        for s in sources:
+            register_plugin(source=s)
+            plugins.append(util.file_to_plugin_name(s))
+
+
     current_path = os.path.join(*DirectoryStack)
     smbuildfile = os.path.join(current_path, CONFIG_NAME)
 
     Packages[name] = base.PackageContainer(
-        name, plugins, filegroups, extends, cfgs, configs, translations, data, gamedata, smbuildfile, template_files, template_args)
+        name, plugins, filegroups, extends, cfg, configs, translations, data, gamedata, smbuildfile, template_files, template_args)
 
 
 def glob_files(file_list, name, warn_on_empty=False):

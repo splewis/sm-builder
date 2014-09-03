@@ -51,13 +51,13 @@ class PluginContainer:
 
 class PackageContainer:
     """Wrapper that represents a package: a collection of plugins and files."""
-    def __init__(self, name, plugins, filegroups, extends_list, cfgs, configs,
+    def __init__(self, name, plugins, filegroups, extends_list, cfg, configs,
                  translations, data, gamedata, smbuildfile, template_files, template_args):
         self.name = name
         self.plugins = plugins
         self.filegroups = filegroups
         self.extends_list = extends_list
-        self.cfgs = cfgs
+        self.cfg = cfg
         self.configs = configs
         self.translations = translations
         self.data = data
@@ -118,11 +118,11 @@ def build_package(package, package_dir, packages=None, plugins=None):
                     'Only files may be put in filegroups: {}'.format(f))
             shutil.copy2(f, filegroup_out_dir)
 
-    util.copy_package_files(package.configs, config_dir)
-    util.copy_package_files(package.translations, translation_dir)
-    util.copy_package_files(package.cfgs, cfg_dir)
-    util.copy_package_files(package.data, data_dir)
-    util.copy_package_files(package.gamedata, gamedata_dir)
+    util.safe_copytree(package.configs, config_dir)
+    util.safe_copytree(package.translations, translation_dir)
+    util.safe_copytree(package.cfg, cfg_dir)
+    util.safe_copytree(package.data, data_dir)
+    util.safe_copytree(package.gamedata, gamedata_dir)
 
 
 def replace_args(package, package_dir, packages):

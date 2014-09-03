@@ -29,6 +29,10 @@ class ParserTests(unittest.TestCase):
     pass
 
 
+class BaseTests(unittest.TestCase):
+    pass
+
+
 class OverallTests(unittest.TestCase):
     def test_overall(self):
         smbuilder.perform_builds('test', 'spcomp')
