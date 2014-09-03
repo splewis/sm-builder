@@ -137,12 +137,12 @@ def replace_args(package, package_dir, packages):
                 f = open(path, 'r')
                 filedata = f.read()
                 f.close()
-
                 for key in template_args:
-                    newdata = filedata.replace('%' + key + '%', template_args[key])
+                    filedata = filedata.replace('%' + key + '%', template_args[key])
+                    filedata = filedata.replace('$' + key + '$', key + ' ' + template_args[key])
 
                 f = open(path, 'w')
-                f.write(newdata)
+                f.write(filedata)
                 f.close()
 
 

@@ -11,4 +11,10 @@ Package(
     filegroups = {
         'cfg': ['*.cfg'],
     },
+    template_files=['server.cfg'],
+    template_args={
+        'hostname': 'myserver',
+        'sv_alltalk': '1',
+        'sv_deadtalk': '0',
+    }
 )

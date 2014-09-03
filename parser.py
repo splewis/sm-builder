@@ -81,7 +81,6 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
                      sources=None, template_files=None, template_args=None,
                      cfg='cfg', configs='configs', gamedata='gamedata',
                      translations='translations', data='data'):
-
     if not name:
         util.error('Packages must specify a name')
     if name in Packages:
@@ -104,12 +103,10 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
     if not template_args:
         template_args = {}
 
-
     if sources:
         for s in sources:
             register_plugin(source=s)
             plugins.append(util.file_to_plugin_name(s))
-
 
     current_path = os.path.join(*DirectoryStack)
     smbuildfile = os.path.join(current_path, CONFIG_NAME)

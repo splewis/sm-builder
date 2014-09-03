@@ -3,7 +3,15 @@ import builder
 import parser
 import smbuilder
 
+import os
 import unittest
+
+
+def check_file_contents(testclass, filename, expected):
+    testclass.assertTrue(os.path.exists(filename))
+    with open(filename) as f:
+        fileinput = map(lambda line: line.strip(), f.readlines())
+        testclass.assertEqual(expected, fileinput)
 
 
 
@@ -36,6 +44,12 @@ class BaseTests(unittest.TestCase):
 class OverallTests(unittest.TestCase):
     def test_overall(self):
         smbuilder.perform_builds('test', 'spcomp')
+
+        package_dir = os.path.join('builds', 'test_package')
+
+        # check server.cfg
+        expected = ['hostname myserver', 'sv_alltalk 1', 'sv_deadtalk 0']
+        check_file_contents(self, os.path.join(package_dir, 'cfg', 'server.cfg'), expected)
 
 
 if __name__ == "__main__":
