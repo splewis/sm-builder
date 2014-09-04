@@ -1,4 +1,4 @@
 Plugin(
-    name = 'test_plugin2',
-    source = 'test_plugin2.sp',
+    name='test_plugin2',
+    source='test_plugin2.sp',
 )

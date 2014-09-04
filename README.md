@@ -66,11 +66,11 @@ In your template file, you may name a variable by surrounding it with ``%`` char
 By example, the following input:
 ```
 Package(
-    name = 'mypackage',
+    name='mypackage',
     template_args={
         'hostname': 'myserver',
         'sv_deadtalk': '0',
-    }
+    },
 )
 ```
 

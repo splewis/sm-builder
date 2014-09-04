@@ -1,19 +1,19 @@
 Include('../test2')
 
 Plugin(
-    name = 'test_plugin',
-    source = 'test_plugin.sp',
+    name='test_plugin',
+    source='test_plugin.sp',
 )
 
 Package(
-    name = 'test_package',
-    plugins = ['test_plugin', 'test_plugin2'],
-    filegroups = {
+    name='test_package',
+    plugins=['test_plugin', 'test_plugin2'],
+    filegroups={
         'cfg': ['*.cfg'],
     },
     template_args={
         'hostname': 'myserver',
         'sv_alltalk': '1',
         'sv_deadtalk': '0',
-    }
+    },
 )
