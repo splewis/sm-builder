@@ -1,11 +1,12 @@
 import includescanner
 import util
 
-import os
 import fileinput
-import subprocess
-import shutil
+import fnmatch
 import glob
+import os
+import shutil
+import subprocess
 
 
 class PluginContainer:
@@ -131,19 +132,20 @@ def replace_args(package, package_dir, packages):
     for root, dirs, files in os.walk(package_dir):
         for file in files:
             path = os.path.join(root, file)
-            # TODO: rather than 'in', there should be regex or glob style matching
-            if any(map(lambda pattern: pattern in path, package.template_files)):
-                # TODO: this should really also use context managers (with open(name) as f:)
-                f = open(path, 'r')
-                filedata = f.read()
-                f.close()
-                for key in template_args:
-                    filedata = filedata.replace('%' + key + '%', template_args[key])
-                    filedata = filedata.replace('$' + key + '$', key + ' ' + template_args[key])
+            if '.smx' not in path:
+                filedata = ''
+                with open(path, 'r') as f:
+                    filedata = f.read()
+                filedata = templatize(filedata, template_args)
+                with open(path, 'w') as f:
+                    f.write(filedata)
 
-                f = open(path, 'w')
-                f.write(filedata)
-                f.close()
+
+def templatize(text, args):
+    for key in args:
+        text = text.replace('%' + key + '%', args[key])
+        text = text.replace('$' + key + '$', key + ' ' + args[key])
+    return text
 
 
 def get_template_args(package, packages):

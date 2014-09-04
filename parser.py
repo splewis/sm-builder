@@ -19,6 +19,7 @@ def parse_configs(config_dir):
     Packages = {}
     DirectoryStack = [config_dir]
     execute_config(config_dir)
+    check_package_cycles(Packages)
     return Plugins, Packages
 
 
@@ -127,3 +128,8 @@ def glob_files(file_list, name, warn_on_empty=False):
             util.warning('No files matched pattern {}'.format(pattern))
 
     return output
+
+
+def check_package_cycles(Packages):
+    # TODO: this should cause a util.error is a package cycle is detected
+    pass

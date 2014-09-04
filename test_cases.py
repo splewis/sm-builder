@@ -14,7 +14,6 @@ def check_file_contents(testclass, filename, expected):
         testclass.assertEqual(expected, fileinput)
 
 
-
 class BuilderTests(unittest.TestCase):
     def test_find_plugin_deps(self):
         def fake_package(name, plugins):
@@ -38,7 +37,25 @@ class ParserTests(unittest.TestCase):
 
 
 class BaseTests(unittest.TestCase):
-    pass
+    def test_templatize(self):
+        text = """
+        sv_tags %myarg%
+        hostname %myarg%
+        $sv_deadtalk$
+        $sv_alltalk$
+        """
+        args = {
+            'myarg': 'myinput',
+            'sv_deadtalk': '1',
+            'sv_alltalk': '1',
+        }
+        actual = base.templatize(text, args)
+        expected = """
+        sv_tags myinput
+        hostname myinput
+        sv_deadtalk 1
+        sv_alltalk 1
+        """
 
 
 class OverallTests(unittest.TestCase):
