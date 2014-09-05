@@ -1,4 +1,7 @@
+MANIFEST
+build
 builds
+dist
 *.smx
 *.zip
 *.pyc

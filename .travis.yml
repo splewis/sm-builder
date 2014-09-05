@@ -1,9 +1,5 @@
 language: python
-  - "2.6"
   - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
 
 install:
   - sudo apt-get update -qq
@@ -11,7 +7,8 @@ install:
   - wget https://dl.dropboxusercontent.com/u/76035852/sm-dev.zip
   - unzip sm-dev.zip
   - chmod +x sm-dev/addons/sourcemod/scripting/spcomp
+  - python setup.py install
 
 script:
   - PATH+=":$PWD/sm-dev/addons/sourcemod/scripting"
-  - "python test_cases.py"
+  - "python test/test_cases.py"
