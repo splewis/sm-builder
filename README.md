@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/splewis/sm-builder.svg?branch=master)](https://travis-ci.org/splewis/sm-builder)
 
-This is a simple build/package tool for managing SourceMod plugins and servers. It is still very much a work in progress. Don't try to use it unless you want to contribute to its development.
+This is a simple build/package tool for managing SourceMod plugins and servers. **It is still very much a work in progress. Don't try to use it unless you want to contribute to its development.**
 
-It uses a simple python-based syntax inspired by Google's internal [Blaze](http://google-engtools.blogspot.fr/2011/08/build-in-cloud-how-build-system-works.html) tool.
+It uses a simple python-based syntax inspired by Google's [Blaze](http://google-engtools.blogspot.fr/2011/08/build-in-cloud-how-build-system-works.html) tool.
 
 General philosophy:
 - Convention over configuration
@@ -12,16 +12,58 @@ General philosophy:
 - Useful to both public-plugin developers and server administrators
 
 
+### A brief example
+
+Consider a plugin (for example: my PugSetup plugin for CS:GO) that lives in the ``scripting`` directory.
+
+You also might have some files under ``cfg``, like ``server.cfg``.
+
+
+**server.cfg**:
+```
+$hostname$
+sv_alltalk 1
+mp_autokick 0
+```
+
+**smbuild:**
+```
+Plugin(name='pugsetup', source='scripting/pugsetup.sp')
+
+Package(name='pugsetup-server',
+        plugins=['pugsetup'],
+        cfg='pugsetup_cfgs',
+        template_args={
+        	'hostname': '10 man server',
+        },
+)
+```
+
+From the directory this all lives in, invoking ``smbuilder`` will
+- compile (if needed) ``scripting/pugsetup.sp``
+- copy the files from ``pugsetup_cfgs`` to the output ``cfg`` directory
+- replace (in ``server.cfg``), ``hostname`` with ``hostname 10 man server``
+
+This will produce the output package, which will live in ``builds/pugsetup-server``, which will have both an ``addons`` directory and a ``cfg`` directory under it, matching the server file layout.
+
 
 ### Installation
 For a unix-style system, you should run:
 - ``git clone https://github.com/splewis/sm-builder``
 - ``cd sm-builder``
 - ``python setup.py install``
-
 - You're done! You can now invoke ``smbuilder`` on the command line.
 
 Windows support **may** come later. It shouldn't take much to get it to work, but there may be small issues to work out before I can claim it works on windows.
+
+
+### Command line usage
+
+- ``smbuilder`` will run the smbuild file in the current directory.
+- ``smbuilder <target>`` will run the smbuild file in the given target directory
+
+#### Flags:
+- ``--compiler (-c)`` specifies a sourcepawn compiler to use (default: spcomp)
 
 
 ### Examples
