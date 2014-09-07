@@ -7,7 +7,7 @@ import os
 OUTPUT_DIR = 'builds'
 
 
-def build(smbuildfile, compiler, plugins, packages):
+def build(smbuildfile, compiler, filelist, plugins, packages):
     # setup directory structure, execute user-configurations
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
     util.mkdir(OUTPUT_DIR)
@@ -42,7 +42,7 @@ def build(smbuildfile, compiler, plugins, packages):
     for name in packages_to_build:
         package = packages[name]
         print('Building package {}'.format(name))
-        package.create(OUTPUT_DIR, packages, plugins)
+        package.create(OUTPUT_DIR, filelist, packages, plugins)
 
     if len(plugins) == 0:
         util.warning('No plugins were found in {}.'.format(

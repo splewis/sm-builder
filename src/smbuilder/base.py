@@ -67,7 +67,7 @@ class PackageContainer:
         self.template_files = template_files
         self.template_args = template_args
 
-    def create(self, output_dir, packages, plugins):
+    def create(self, output_dir, filelist, packages, plugins):
         # clears out the package, then rebuilds it
         package_dir = os.path.join(output_dir, self.name)
         if os.path.exists(package_dir):
@@ -75,6 +75,13 @@ class PackageContainer:
         util.mkdir(package_dir)
         build_package(self, package_dir, packages, plugins)
         replace_args(self, package_dir, packages)
+
+        # create package description filegroups
+        if filelist:
+            list = util.list_files_recursively(package_dir)
+            with open(os.path.join(package_dir, 'files.txt'), 'w') as f:
+                for package_file in list:
+                    f.write(package_file + '\n')
 
 
 def build_package(package, package_dir, packages=None, plugins=None):

@@ -61,6 +61,14 @@ def copy_package_files(list, dir):
             shutil.copy2(f, dir)
 
 
+def list_files_recursively(path):
+    results = []
+    for dirname, dirnames, filenames in os.walk(path):
+        for filename in filenames:
+            results.append(os.path.relpath(os.path.join(dirname, filename), path))
+    return results
+
+
 def file_to_plugin_name(filename):
     plugin_name = os.path.basename(filename)
     return os.path.splitext(plugin_name)[0]

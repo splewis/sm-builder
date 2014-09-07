@@ -8,10 +8,10 @@ import os
 import shutil
 
 
-def perform_builds(target, compiler):
+def perform_builds(target, compiler, filelist):
     plugins, packages = smbuilder.parser.parse_configs(target)
     smbuildfile = os.path.join(target, smbuilder.parser.CONFIG_NAME)
-    smbuilder.builder.build(smbuildfile, compiler, plugins, packages)
+    smbuilder.builder.build(smbuildfile, compiler, filelist, plugins, packages)
 
 
 def clean():
@@ -25,6 +25,7 @@ def main():
     parser.add_argument('target', nargs='?')
     parser.add_argument('-c', '--compiler', default='spcomp',
                         help='Sourcepawn compiler to use.')
+    parser.add_argument('--filelist', action='store_true')
     args = parser.parse_args()
 
     if not args.target:
@@ -33,7 +34,7 @@ def main():
     if args.target == 'clean':
         clean()
     else:
-        perform_builds(args.target, args.compiler)
+        perform_builds(args.target, args.compiler, args.filelist)
 
 
 if __name__ == '__main__':
