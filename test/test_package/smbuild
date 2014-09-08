@@ -11,7 +11,7 @@ Package(
     filegroups={
         'cfg': ['*.cfg'],
     },
-    template_args={
+    args={
         'hostname': 'myserver',
         'sv_alltalk': '1',
         'sv_deadtalk': '0',

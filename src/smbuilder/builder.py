@@ -56,5 +56,9 @@ def find_plugin_deps(package, packages_dict):
     for p in package.plugins:
         plugins.add(p)
     for p in package.extends_list:
+        if p not in packages_dict:
+            err_msg = 'Package {} extends non-existent package {}'
+            util.error(err_msg.format(package.name, p))
+
         plugins.update(find_plugin_deps(packages_dict[p], packages_dict))
     return plugins

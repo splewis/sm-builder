@@ -33,7 +33,7 @@ Plugin(name='pugsetup', source='scripting/pugsetup.sp')
 Package(name='pugsetup-server',
         plugins=['pugsetup'],
         cfg='pugsetup_cfgs',
-        template_args={
+        args={
         	'hostname': '10 man server',
         },
 )
@@ -93,7 +93,7 @@ Registering a ``Package`` has the following named arguments:
 - ``gamedata``: directory name to bring files from ``addons/sourcemod/gamedata`` from
 - ``translations``: directory name to bring files from ``addons/sourcemod/translations`` from
 - ``sources``: list of source code files to also compile into the package (this is a shortcut for creating a ``Plugin`` for each one)
-- ``template_args``: dictionary of template arguments to replace in files that match one of the ``template_files``
+- ``args``: dictionary of arguments to replace in non-binary files
 - ``filegroups``: dictionary of output directory name -> list of input files to package into the build
 
 
@@ -107,7 +107,7 @@ By example, the following input:
 ```
 Package(
     name='mypackage',
-    template_args={
+    args={
         'hostname': 'myserver',
         'sv_deadtalk': '0',
     },
