@@ -11,23 +11,18 @@ import subprocess
 
 class PluginContainer:
     """Wrapper that represents a single sourcemod plugin."""
-    def __init__(self, name, source, compiler, smbuildfile, deps):
+    def __init__(self, name, source, smbuildfile, deps):
         self.name = name
         self.source = source
-        self.compiler = compiler
         self.smbuildfile = smbuildfile
         self.deps = deps
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
         self.source_files = set()
 
     def compile(self, compiler, output_dir):
+        """Compiles, if needed the plugin and returns whether it was compiled."""
         latest_source_change, self.source_files = (
             includescanner.find_last_time_modified(self.source))
-
-        if self.compiler:
-            compiler_to_use = self.compiler  # uses the plugin-defined compiler
-        else:
-            compiler_to_use = compiler  # uses the globally-defined compiler
 
         binary_file_name = os.path.join(output_dir, self.name + '.smx')
         latest_binary_change = 0
@@ -35,7 +30,7 @@ class PluginContainer:
             latest_binary_change = os.path.getmtime(binary_file_name)
 
         if latest_source_change > latest_binary_change:
-            cmd = '{0} {1} -o={2}'.format(compiler_to_use,
+            cmd = '{0} {1} -o={2}'.format(compiler,
                                           self.source,
                                           os.path.join(output_dir, self.name))
             try:
@@ -69,6 +64,7 @@ class PackageContainer:
         self.warn_undefined_args = warn_undefined_args
 
     def create(self, output_dir, filelist, packages, plugins):
+        """Creates the package output."""
         # clears out the package, then rebuilds it
         package_dir = os.path.join(output_dir, self.name)
         if os.path.exists(package_dir):
@@ -85,7 +81,8 @@ class PackageContainer:
                     f.write(package_file + '\n')
 
 
-def build_package(package, package_dir, packages=None, plugins=None):
+def build_package(package, package_dir, packages, plugins):
+    """Support function for building package files into a given directory."""
     for p in package.extends_list:
         try:
             build_package(packages[p], package_dir, packages, plugins)
@@ -135,6 +132,7 @@ def build_package(package, package_dir, packages=None, plugins=None):
 
 
 def replace_args(package, package_dir, packages):
+    """Performs replacement of template arguments within a directory for a package."""
     template_args = get_template_args(package, packages)
 
     for root, dirs, files in os.walk(package_dir):
@@ -152,6 +150,7 @@ def replace_args(package, package_dir, packages):
 
 
 def templatize(text, args):
+    """Replaces template arguments in a string of text."""
     used_args = set()
     for key in args:
         value = str(args[key])
@@ -164,6 +163,7 @@ def templatize(text, args):
 
 
 def get_template_args(package, packages):
+    """Returns a dictionary of all arguments a package contains."""
     args = {}
     # get inherited values
     for base_name in package.extends_list:
@@ -177,6 +177,7 @@ def get_template_args(package, packages):
 
 
 def check_undefined_templates(text, package, filename):
+    """Checks and warns on any template arguments left undefined in the package output."""
     for word in text.split():
         first = word[0]
         last = word[-1]

@@ -8,6 +8,7 @@ OUTPUT_DIR = 'builds'
 
 
 def build(smbuildfile, compiler, filelist, plugins, packages):
+    """Performs the entire build process."""
     # setup directory structure, execute user-configurations
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
     util.mkdir(OUTPUT_DIR)
@@ -52,6 +53,7 @@ def build(smbuildfile, compiler, filelist, plugins, packages):
 
 
 def find_plugin_deps(package, packages_dict):
+    """Returns a set of plugin names that a package includes."""
     plugins = set()
     for p in package.plugins:
         plugins.add(p)

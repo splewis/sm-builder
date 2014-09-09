@@ -13,6 +13,11 @@ DirectoryStack = []
 
 
 def parse_configs(config_dir):
+    """
+    Exectues a smbuild configuration file in the given directory and
+    builds the global data structures needed.
+    (i.e. the Plugins and Packages dictionaries)
+    """
     global DirectoryStack, Packages, Plugins, IncludedPaths
     IncludedPaths = set()
     Plugins = {}
@@ -24,6 +29,10 @@ def parse_configs(config_dir):
 
 
 def glob_plugins(pattern):
+    """
+    Registers all source files that match a pattern
+    as a Plugin.
+    """
     path = os.path.join(*DirectoryStack)
     results = glob.glob(os.path.join(path, pattern))
     for source_file in results:
@@ -31,6 +40,9 @@ def glob_plugins(pattern):
 
 
 def execute_config(dir_path):
+    """
+    Executes an smbuild configuration file.
+    """
     filename = os.path.abspath(os.path.join(dir_path, CONFIG_NAME))
     if os.path.exists(filename):
         context = {
@@ -51,6 +63,10 @@ def execute_config(dir_path):
 
 
 def register_include(path):
+    """
+    Registers an include, adding any files from that include
+    to the global data structures.
+    """
     global DirectoryStack
     abspath = os.path.abspath(path)
     if abspath not in IncludedPaths:
@@ -60,7 +76,11 @@ def register_include(path):
         IncludedPaths.add(abspath)
 
 
-def register_plugin(name=None, source=None, compiler=None, deps=None):
+def register_plugin(name=None, source=None, deps=None):
+    """
+    Registers a new Plugin.
+    The source field is mandatory.
+    """
     if not source:
         util.error('Plugins must specify a source')
     if not name:
@@ -75,13 +95,17 @@ def register_plugin(name=None, source=None, compiler=None, deps=None):
     if deps is None:
         deps = []
 
-    Plugins[name] = base.PluginContainer(name, source_path, compiler, smbuildfile, deps)
+    Plugins[name] = base.PluginContainer(name, source_path, smbuildfile, deps)
 
 
 def register_package(name=None, plugins=None, filegroups=None, extends=None,
                      sources=None, template_files=None, args=None, warn_undefined_args=True,
                      cfg='cfg', configs='configs', gamedata='gamedata',
                      translations='translations', data='data'):
+    """
+    Registers a new Package.
+    The name field is mandatory.
+    """
     if not name:
         util.error('Packages must specify a name')
     if name in Packages:
@@ -117,6 +141,10 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
 
 
 def glob_files(file_list, name, warn_on_empty=False):
+    """
+    Support function for pattern matching on files that
+    returns a list of matching files.
+    """
     output = []
     current_path = os.path.join(*DirectoryStack)
     for pattern in file_list:
