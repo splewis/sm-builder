@@ -136,6 +136,17 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
     current_path = os.path.join(*DirectoryStack)
     smbuildfile = os.path.join(current_path, CONFIG_NAME)
 
+    if cfg:
+        cfg = os.path.join(current_path, cfg)
+    if translations:
+        translations = os.path.join(current_path, translations)
+    if gamedata:
+        gamedata = os.path.join(current_path, gamedata)
+    if configs:
+        configs = os.path.join(current_path, configs)
+    if data:
+        data = os.path.join(current_path, data)
+
     Packages[name] = base.PackageContainer(
         name, plugins, filegroups, extends, cfg, configs, translations, data, gamedata, smbuildfile, template_files, args, warn_undefined_args)
 
