@@ -11,9 +11,10 @@ import subprocess
 
 class PluginContainer:
     """Wrapper that represents a single sourcemod plugin."""
-    def __init__(self, name, source, smbuildfile, deps):
+    def __init__(self, name, source, binary, smbuildfile, deps):
         self.name = name
         self.source = source
+        self.binary = binary
         self.smbuildfile = smbuildfile
         self.deps = deps
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
@@ -21,6 +22,10 @@ class PluginContainer:
 
     def compile(self, compiler, output_dir):
         """Compiles, if needed the plugin and returns whether it was compiled."""
+        if self.binary:
+            shutil.copyfile(self.binary, output_dir)
+            return False
+
         latest_source_change, self.source_files = (
             includescanner.find_last_time_modified(self.source))
 

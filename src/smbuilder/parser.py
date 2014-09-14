@@ -76,15 +76,22 @@ def register_include(path):
         IncludedPaths.add(abspath)
 
 
-def register_plugin(name=None, source=None, deps=None):
+def register_plugin(name=None, source=None, deps=None, binary=None):
     """
     Registers a new Plugin.
-    The source field is mandatory.
     """
-    if not source:
-        util.error('Plugins must specify a source')
-    if not name:
-        name = util.file_to_plugin_name(source)
+    if source and binary:
+        msg = 'the source and binary fields cannot be used together in a plugin'
+        util.error(msg)
+    if source:
+        if not name:
+            name = util.file_to_plugin_name(source)
+    elif binary:
+        if not name:
+            name = util.file_to_plugin_name(binary)
+    else:
+        util.error('All plugins must define a source or a binary')
+
     if name in Plugins:
         util.error('duplicated plugin name {}'.format(name))
 
@@ -95,7 +102,7 @@ def register_plugin(name=None, source=None, deps=None):
     if deps is None:
         deps = []
 
-    Plugins[name] = base.PluginContainer(name, source_path, smbuildfile, deps)
+    Plugins[name] = base.PluginContainer(name, source_path, binary, smbuildfile, deps)
 
 
 def register_package(name=None, plugins=None, filegroups=None, extends=None,

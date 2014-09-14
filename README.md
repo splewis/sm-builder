@@ -77,7 +77,8 @@ Some examples are my sourcemod plugin projects:
 You may define a ``Plugin`` or ``Package``.
 
 Registering a ``Plugin`` have the following named arguments:
-- ``source``: **required**, source code file for the plugin
+- ``source``: source code file for the plugin (cannot be used if ``binary`` is used)
+- ``binary``: binary file for the plugin (cannot be used if ``source`` is used)
 - ``name``: unique name that identifies the plugin, if not defined, the filename (minus extension) is used as the name
 - ``compiler``: compiler that the plugin should use (if none defined, the command-line provided compiler is used)
 - ``deps``: names of other plugins that this plugin relies on (i.e. runtime dependencies)
