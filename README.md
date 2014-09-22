@@ -54,7 +54,7 @@ For a unix-style system, you should run:
 - ``python setup.py install``
 - You're done! You can now invoke ``smbuilder`` on the command line.
 
-It's also a good idea to set a ``spcomp`` environment variable, otherwise you will need to set the compiler as a flag (see below). For example, I have this in my .bashrc:
+It's also a good idea to have a ``spcomp`` in the system path, otherwise you will need to set the compiler as a flag (see below). For example, I have this in my .bashrc:
 
 ```
 PATH+=":/home/splewis/sm-1.7/scripting"
