@@ -32,6 +32,11 @@ def build(smbuildfile, compiler, filelist, plugins, packages):
                     msg = 'Plugin {} depends on {}, but is not part of package {}'.format(plugin_name, dep, name)
                     util.warning(msg)
 
+    # also compile any plugins from this smbuildfile
+    for plugin_name in plugins:
+        if plugins[plugin_name].smbuildfile == smbuildfile:
+            plugins_to_compile.add(plugin_name)
+
     # compile plugins
     compiled_count = 0
     for name in plugins_to_compile:
