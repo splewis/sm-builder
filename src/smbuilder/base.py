@@ -8,6 +8,8 @@ import os
 import shutil
 import subprocess
 
+import jinja2
+
 
 class PluginContainer:
     """Wrapper that represents a single sourcemod plugin."""
@@ -53,7 +55,7 @@ class PluginContainer:
 class PackageContainer:
     """Wrapper that represents a package: a collection of plugins and files."""
     def __init__(self, name, plugins, filegroups, extends_list, cfg, configs,
-                 translations, data, gamedata, smbuildfile, template_files, template_args, warn_undefined_args):
+                 translations, data, gamedata, smbuildfile, template_files, template_args):
         self.name = name
         self.plugins = plugins
         self.filegroups = filegroups
@@ -66,7 +68,6 @@ class PackageContainer:
         self.smbuildfile = smbuildfile
         self.template_files = template_files
         self.template_args = template_args
-        self.warn_undefined_args = warn_undefined_args
 
     def create(self, output_dir, filelist, packages, plugins):
         """Creates the package output."""
@@ -148,23 +149,14 @@ def replace_args(package, package_dir, packages):
                 with open(path, 'r') as f:
                     filedata = f.read()
                 filedata = templatize(filedata, template_args)
-                if package.warn_undefined_args:
-                    check_undefined_templates(filedata, package, file)
                 with open(path, 'w') as f:
                     f.write(filedata)
 
 
 def templatize(text, args):
     """Replaces template arguments in a string of text."""
-    used_args = set()
-    for key in args:
-        value = str(args[key])
-        new_text = text.replace('%' + key + '%', value)
-        new_text = new_text.replace('$' + key + '$', key + ' ' + value)
-        if text != new_text:
-            used_args.add(key)
-        text = new_text
-    return text
+    template = jinja2.Template(text)
+    return template.render(**args)
 
 
 def get_template_args(package, packages):
@@ -179,13 +171,3 @@ def get_template_args(package, packages):
     for arg in package.template_args:
         args[arg] = package.template_args[arg]
     return args
-
-
-def check_undefined_templates(text, package, filename):
-    """Checks and warns on any template arguments left undefined in the package output."""
-    for word in text.split():
-        first = word[0]
-        last = word[-1]
-        if len(word) >= 3 and first == last and (first == '$' or first == '%'):
-            msg = 'Undefined template argument: \'{}\': from package \'{}\', file \'{}\''.format(word, package.name, filename)
-            util.warning(msg)

@@ -21,7 +21,7 @@ You also might have some files under ``cfg``, like ``server.cfg``.
 
 **server.cfg**:
 ```
-$hostname$
+hostname {{hostname}}
 sv_alltalk 1
 mp_autokick 0
 ```
@@ -58,6 +58,11 @@ It's also a good idea to have a ``spcomp`` in the system path, otherwise you wil
 
 ```
 PATH+=":/home/splewis/sm-1.7/scripting"
+```
+
+You will also need Jinja2 installed, as it is used for templating. You can install it via pip using:
+```
+pip install Jinja2
 ```
 
 Windows support **may** come later. It shouldn't take much to get it to work, but there may be small issues to work out before I can claim it works on windows.
@@ -107,27 +112,35 @@ Registering a ``Package`` has the following named arguments:
 You may also include plugins/packages from another directory using ``Include``.
 
 
-### How to use template arguments
-In your template file, you may name a variable by surrounding it with ``%`` character or ``$`` characters. A ``%`` will purely replace, while a ``$`` will simply remove the ``$`` and add a space, then the value.
+### How to use templates
 
-By example, the following input:
+[Jinja2](http://jinja.pocoo.org/) is used for templating config files. Here is an brief example:
+
 ```
 Package(
     name='mypackage',
     args={
         'hostname': 'myserver',
-        'sv_deadtalk': '0',
+        'competitive': True,
     },
 )
 ```
 
 ```
 hostname %hostname%
-$sv_deadtalk$
+
+{% if competitive %}
+sv_alltalk 0
+sv_deadtalk 1
+{% else %}
+sv_alltalk 1
+sv_deadtalk 0
+{% endif %}
 ```
 
 will produce an output file of:
 ```
 hostname myserver
-sv_deadtalk 0
+sv_alltalk 0
+sv_deadtalk 1
 ```

@@ -1,4 +1,4 @@
-Include('../test2')
+Include('../test_package2')
 
 Plugin(
     name='test_plugin',
