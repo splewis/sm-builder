@@ -144,7 +144,7 @@ def replace_args(package, package_dir, packages):
     for root, dirs, files in os.walk(package_dir):
         for file in files:
             path = os.path.join(root, file)
-            if '.smx' not in path:
+            if '.cfg' in path:
                 filedata = ''
                 with open(path, 'r') as f:
                     filedata = f.read()
