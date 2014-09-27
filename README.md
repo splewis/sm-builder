@@ -21,7 +21,7 @@ You also might have some files under ``cfg``, like ``server.cfg``.
 
 **server.cfg**:
 ```
-hostname {{hostname}}
+hostname {{name}}
 sv_alltalk 1
 mp_autokick 0
 ```
@@ -34,7 +34,7 @@ Package(name='pugsetup-server',
         plugins=['pugsetup'],
         cfg='pugsetup_cfgs',
         args={
-        	'hostname': '10 man server',
+        	'name': '10 man server',
         },
 )
 ```
@@ -54,7 +54,7 @@ For a unix-style system, you should run:
 - ``python setup.py install``
 - You're done! You can now invoke ``smbuilder`` on the command line.
 
-It's also a good idea to have a ``spcomp`` in the system path, otherwise you will need to set the compiler as a flag (see below). For example, I have this in my .bashrc:
+It's also a good idea to have a ``spcomp`` in the system path, otherwise you will need to set the compiler as a flag (see below). For example, since my sourcemod compiler ``spcomp`` is in ``/home/splewis/sm-1.7/scripting``, I have this in my .bashrc:
 
 ```
 PATH+=":/home/splewis/sm-1.7/scripting"
@@ -120,14 +120,14 @@ You may also include plugins/packages from another directory using ``Include``.
 Package(
     name='mypackage',
     args={
-        'hostname': 'myserver',
+        'name': 'myserver',
         'competitive': True,
     },
 )
 ```
 
 ```
-hostname %hostname%
+hostname {{name}}
 
 {% if competitive %}
 sv_alltalk 0
