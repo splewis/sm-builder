@@ -14,7 +14,7 @@ General philosophy:
 
 ### A brief example
 
-Consider a plugin (for example: my PugSetup plugin for CS:GO) that lives in the ``scripting`` directory.
+Consider a plugin (for example: my [PugSetup](https://github.com/splewis/csgo-pug-setup) plugin for CS:GO) that lives in the ``scripting`` directory.
 
 You also might have some files under ``cfg``, like ``server.cfg``.
 
@@ -32,7 +32,6 @@ Plugin(name='pugsetup', source='scripting/pugsetup.sp')
 
 Package(name='pugsetup-server',
         plugins=['pugsetup'],
-        cfg='pugsetup_cfgs',
         args={
         	'name': '10 man server',
         },
@@ -49,20 +48,17 @@ This will produce the output package, which will live in ``builds/pugsetup-serve
 
 ### Installation
 For a unix-style system, you should run:
-- ``git clone https://github.com/splewis/sm-builder``
-- ``cd sm-builder``
-- ``python setup.py install``
-- You're done! You can now invoke ``smbuilder`` on the command line.
+
+1. Install Jinja2: ``pip install Jinja2``
+1. Clone the repository: ``git clone https://github.com/splewis/sm-builder``
+1. Change into the repo: ``cd sm-builder``
+1. Install it: ``python setup.py install``
+1. You're done! You can now invoke ``smbuilder`` on the command line.
 
 It's also a good idea to have a ``spcomp`` in the system path, otherwise you will need to set the compiler as a flag (see below). For example, since my sourcemod compiler ``spcomp`` is in ``/home/splewis/sm-1.7/scripting``, I have this in my .bashrc:
 
 ```
 PATH+=":/home/splewis/sm-1.7/scripting"
-```
-
-You will also need Jinja2 installed, as it is used for templating. You can install it via pip using:
-```
-pip install Jinja2
 ```
 
 Windows support **may** come later. It shouldn't take much to get it to work, but there may be small issues to work out before I can claim it works on windows.
@@ -91,7 +87,6 @@ Registering a ``Plugin`` have the following named arguments:
 - ``source``: source code file for the plugin (cannot be used if ``binary`` is used)
 - ``binary``: binary file for the plugin (cannot be used if ``source`` is used)
 - ``name``: unique name that identifies the plugin, if not defined, the filename (minus extension) is used as the name
-- ``compiler``: compiler that the plugin should use (if none defined, the command-line provided compiler is used)
 - ``deps``: names of other plugins that this plugin relies on (i.e. runtime dependencies)
 
 
