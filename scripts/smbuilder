@@ -8,12 +8,6 @@ import os
 import shutil
 
 
-def perform_builds(target, compiler, filelist):
-    plugins, packages = smbuilder.parser.parse_configs(target)
-    smbuildfile = os.path.join(target, smbuilder.parser.CONFIG_NAME)
-    smbuilder.builder.build(smbuildfile, compiler, filelist, plugins, packages)
-
-
 def clean():
     if os.path.exists(smbuilder.builder.OUTPUT_DIR):
         shutil.rmtree(smbuilder.builder.OUTPUT_DIR)
@@ -34,7 +28,7 @@ def main():
     if args.target == 'clean':
         clean()
     else:
-        perform_builds(args.target, args.compiler, args.filelist)
+        builder.perform_builds(args.target, args.compiler, args.filelist)
 
 
 if __name__ == '__main__':

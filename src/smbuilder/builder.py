@@ -1,10 +1,18 @@
 import base
+import parser
 import util
 
 import os
 
 
 OUTPUT_DIR = 'builds'
+
+
+def perform_builds(target='.', compiler='spcomp', filelist=False):
+    """Main library entrance to build packages."""
+    plugins, packages = parser.parse_configs(target)
+    smbuildfile = os.path.join(target, parser.CONFIG_NAME)
+    build(smbuildfile, compiler, filelist, plugins, packages)
 
 
 def build(smbuildfile, compiler, filelist, plugins, packages):
