@@ -46,12 +46,12 @@ From the directory this all lives in, invoking ``smbuilder`` will
 This will produce the output package, which will live in ``builds/pugsetup-server``, which will have both an ``addons`` directory and a ``cfg`` directory under it, matching the server file layout.
 
 
-### Installation
+### Installing a development version
 For a unix-style system, you should run:
 
-1. Install Jinja2: ``pip install Jinja2``
 1. Clone the repository: ``git clone https://github.com/splewis/sm-builder``
-1. Change into the repo: ``cd sm-builder``
+1. Move into the repo: ``cd sm-builder``
+1. Install python dependencies: ``sudo pip install -r requirements.txt``
 1. Install it: ``python setup.py install``
 1. You're done! You can now invoke ``smbuilder`` on the command line.
 

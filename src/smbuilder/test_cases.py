@@ -48,7 +48,8 @@ class BaseTests(unittest.TestCase):
 
 class OverallTest(unittest.TestCase):
     def test_overall(self):
-        target = 'testpackages/test_package'
+        dirpath = os.path.dirname(os.path.realpath(__file__))
+        target = os.path.join(dirpath, 'testpackages', 'test_package')
         builder.perform_builds(target, compiler='spcomp')
 
 
