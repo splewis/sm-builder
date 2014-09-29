@@ -8,8 +8,7 @@ install:
   - unzip sm-dev.zip
   - chmod +x sm-dev/addons/sourcemod/scripting/spcomp
   - sudo pip install -r requirements.txt
-  - sudo python setup.py install
 
 script:
   - PATH+=":$PWD/sm-dev/addons/sourcemod/scripting"
-  - "python test/test_cases.py"
+  - "python src/smbuilder/test_cases.py"

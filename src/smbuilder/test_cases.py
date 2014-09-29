@@ -1,7 +1,7 @@
-# import smbuilder
-import smbuilder.base
-import smbuilder.builder
-import smbuilder.parser
+import smbuilder
+import base
+import builder
+import parser
 
 import os
 import unittest
@@ -49,6 +49,16 @@ class BaseTests(unittest.TestCase):
         sv_deadtalk 1
         sv_alltalk 1
         """
+
+
+class OverallTest(unittest.TestCase):
+    def test_overall(self):
+        target = 'testpackages/test_package'
+        plugins, packages = smbuilder.parser.parse_configs(target)
+        smbuildfile = os.path.join(target, smbuilder.parser.CONFIG_NAME)
+        smbuilder.builder.build(smbuildfile, 'spcomp', False, plugins, packages)
+
+
 
 if __name__ == "__main__":
     unittest.main()
