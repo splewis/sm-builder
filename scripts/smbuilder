@@ -28,7 +28,7 @@ def main():
     if args.target == 'clean':
         clean()
     else:
-        builder.perform_builds(args.target, args.compiler, args.filelist)
+        smbuilder.builder.perform_builds(args.target, args.compiler, args.filelist)
 
 
 if __name__ == '__main__':
