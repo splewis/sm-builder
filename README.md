@@ -135,6 +135,7 @@ Package(
 )
 ```
 
+some file in the `cfg` directory:
 ```
 hostname {{name}}
 
@@ -147,9 +148,11 @@ sv_deadtalk 0
 {% endif %}
 ```
 
-will produce an output file of:
+will produce a corresponding output file of:
 ```
 hostname myserver
 sv_alltalk 0
 sv_deadtalk 1
 ```
+
+With this strategy you can simply using different configuration values and files in different packages.
