@@ -1,18 +1,32 @@
 [![Build Status](https://travis-ci.org/splewis/sm-builder.svg?branch=master)](https://travis-ci.org/splewis/sm-builder)
 
-This is a simple build/package tool for managing SourceMod plugins and servers. **It is still very much a work in progress. Don't try to use it unless you want to contribute to its development.**
+**This is still very much a work in progress. Don't try to use it unless you want to contribute to its development.**
 
-It uses a simple python-based syntax inspired by Google's [Blaze](http://google-engtools.blogspot.fr/2011/08/build-in-cloud-how-build-system-works.html) tool.
+**smbuilder** is a build/package tool for managing SourceMod plugins and servers. It works as a command-line tool that:
+- reads a configuration file
+- compiles any changed plugins
+- creates packages, which are just sets of files ready to be uploaded to a server
 
-General philosophy:
+#### Why is it helpful?
+- Helps you have 1 file that defines what goes on a server, by creating a package for it
+- Convenient way to manage configuration files
+- Intelligent templating of config files (using [Jinja2](http://jinja.pocoo.org/)), which makes it easy to reuse files with slight changes for different servers
+
+#### What doesn't it do?
+- Doesn't upload files to a server (a script to do this may come in the future though)
+- Doesn't deal with old files on a server - they won't get removed easily (maybe in the future I'll have a way to handle that)
+
+
+The config files are just python files, with a syntax inspired by Google's [Blaze](http://google-engtools.blogspot.fr/2011/08/build-in-cloud-how-build-system-works.html) tool.
+
+#### General philosophy:
 - Convention over configuration
-- Allows custom rules
 - Simple configuration syntax
-- User friendly (especially when presenting errors - no python stack traces!)
+- User friendly (especially when presenting errors - avoid python stack traces!)
 - Useful to both public-plugin developers and server administrators
 
 
-### A brief example
+## A brief example
 
 Consider a plugin (for example: my [PugSetup](https://github.com/splewis/csgo-pug-setup) plugin for CS:GO) that lives in the ``scripting`` directory.
 
@@ -46,7 +60,7 @@ From the directory this all lives in, invoking ``smbuilder`` will
 This will produce the output package, which will live in ``builds/pugsetup-server``, which will have both an ``addons`` directory and a ``cfg`` directory under it, matching the server file layout.
 
 
-### Installing a development version
+## Installing a development version
 For a unix-style system, you should run:
 
 1. Clone the repository: ``git clone https://github.com/splewis/sm-builder``
@@ -64,7 +78,7 @@ PATH+=":/home/splewis/sm-1.7/scripting"
 Windows support **may** come later. It shouldn't take much to get it to work, but there may be small issues to work out before I can claim it works on windows.
 
 
-### Command line usage
+## Command line usage
 
 - ``smbuilder`` will run the smbuild file in the current directory.
 - ``smbuilder <target>`` will run the smbuild file in the given target directory
@@ -73,14 +87,14 @@ Windows support **may** come later. It shouldn't take much to get it to work, bu
 - ``--compiler (-c)`` specifies a sourcepawn compiler to use (default: spcomp)
 
 
-### Examples
+## Examples
 Some examples are my sourcemod plugin projects:
 - https://github.com/splewis/csgo-multi-1v1/blob/master/smbuild
 - https://github.com/splewis/csgo-pug-setup/blob/master/smbuild
 - https://github.com/splewis/smart-player-reports/blob/master/smbuild
 
 
-### Usage
+## Usage
 You may define a ``Plugin`` or ``Package``.
 
 Registering a ``Plugin`` have the following named arguments:
@@ -107,7 +121,7 @@ Registering a ``Package`` has the following named arguments:
 You may also include plugins/packages from another directory using ``Include``.
 
 
-### How to use templates
+## How to use templates
 
 [Jinja2](http://jinja.pocoo.org/) is used for templating config files. Here is an brief example:
 
