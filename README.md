@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/splewis/sm-builder.svg?branch=master)](https://travis-ci.org/splewis/sm-builder)
 
-**This is still very much a work in progress. Don't try to use it unless you want to contribute to its development.**
+**This is still very much a work in progress. Don't try to use it unless you want to contribute to its development. Currently, this only targets python 2.7 and unix-like systems**
 
 **smbuilder** is a build/package tool for managing SourceMod plugins and servers. It works as a command-line tool that:
 - reads a configuration file
