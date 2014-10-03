@@ -17,7 +17,7 @@ def perform_builds(target='.', compiler='spcomp', filelist=False):
 
 def build(smbuildfile, compiler, filelist, plugins, packages):
     """Performs the entire build process."""
-    # setup directory structure, execute user-configurations
+    # setup directory structure, execute user-configurationsz
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
     util.mkdir(OUTPUT_DIR)
     util.mkdir(plugin_build_dir)

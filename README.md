@@ -88,6 +88,10 @@ Windows support **may** come later. It shouldn't take much to get it to work, bu
 
 
 ## Examples
+Examples from smbuilder's testing:
+- [test_package](src/smbuilder/testpackages/test_package/smbuild)
+- [test_package2](src/smbuilder/testpackages/test_package2/smbuild)
+
 Some examples are my sourcemod plugin projects:
 - https://github.com/splewis/csgo-multi-1v1/blob/master/smbuild
 - https://github.com/splewis/csgo-pug-setup/blob/master/smbuild
