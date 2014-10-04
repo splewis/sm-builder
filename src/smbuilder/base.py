@@ -77,7 +77,7 @@ class PackageContainer:
             shutil.rmtree(package_dir)
         util.mkdir(package_dir)
         build_package(self, package_dir, packages, plugins)
-        replace_args(self, package_dir, packages)
+        replace_args(self, package_dir, packages, plugins)
 
         # create package description filegroups
         if filelist:
@@ -137,9 +137,9 @@ def build_package(package, package_dir, packages, plugins):
     util.safe_copytree(package.gamedata, gamedata_dir)
 
 
-def replace_args(package, package_dir, packages):
+def replace_args(package, package_dir, packages, plugins):
     """Performs replacement of template arguments within a directory for a package."""
-    template_args = get_template_args(package, packages)
+    template_args = get_template_args(package, packages, plugins)
 
     for root, dirs, files in os.walk(package_dir):
         for file in files:
@@ -159,15 +159,37 @@ def templatize(text, args):
     return template.render(**args)
 
 
-def get_template_args(package, packages):
+def get_template_args(package, packages, plugins):
     """Returns a dictionary of all arguments a package contains."""
     args = {}
     # get inherited values
     for base_name in package.extends_list:
         base = packages[base_name]
-        args.update(get_template_args(base, packages))
+        args.update(get_template_args(base, packages, plugins))
 
     # get values from this package, overwriting old ones
     for arg in package.template_args:
         args[arg] = package.template_args[arg]
+
+    # create extra plugin_binaries argument
+    plugin_binaries = []
+    deps = find_plugin_deps(package, packages)
+    for dep in deps:
+        plugin_binaries.append(plugins[dep].name + '.smx')
+    args['plugin_binaries'] = plugin_binaries
+
     return args
+
+
+def find_plugin_deps(package, packages_dict):
+    """Returns a set of plugin names that a package includes."""
+    plugins = set()
+    for p in package.plugins:
+        plugins.add(p)
+    for p in package.extends_list:
+        if p not in packages_dict:
+            err_msg = 'Package {} extends non-existent package {}'
+            util.error(err_msg.format(package.name, p))
+
+        plugins.update(find_plugin_deps(packages_dict[p], packages_dict))
+    return plugins

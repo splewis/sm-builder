@@ -160,3 +160,5 @@ sv_deadtalk 1
 ```
 
 With this strategy you can simply using different configuration values and files in different packages.
+
+There is a special arguments you can use in config files: ``plugin_binaries``, which is set to the list of plugin binary filenames in the package.

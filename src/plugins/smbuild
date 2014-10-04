@@ -1,0 +1,6 @@
+Plugin(source='scripting/plugin_whitelist.sp')
+
+Package(
+    name='plugin_whitelist',
+    plugins=['plugin_whitelist'],
+)

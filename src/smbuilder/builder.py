@@ -30,7 +30,7 @@ def build(smbuildfile, compiler, filelist, plugins, packages):
 
     plugins_to_compile = set()
     for name in packages_to_build:
-        for_this_package = find_plugin_deps(packages[name], packages)
+        for_this_package = base.find_plugin_deps(packages[name], packages)
         for plugin_name in for_this_package:
             plugins_to_compile.add(plugin_name)
 
@@ -64,16 +64,3 @@ def build(smbuildfile, compiler, filelist, plugins, packages):
     elif compiled_count == 0:
         print('All plugins up to date.')
 
-
-def find_plugin_deps(package, packages_dict):
-    """Returns a set of plugin names that a package includes."""
-    plugins = set()
-    for p in package.plugins:
-        plugins.add(p)
-    for p in package.extends_list:
-        if p not in packages_dict:
-            err_msg = 'Package {} extends non-existent package {}'
-            util.error(err_msg.format(package.name, p))
-
-        plugins.update(find_plugin_deps(packages_dict[p], packages_dict))
-    return plugins

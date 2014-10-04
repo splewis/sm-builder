@@ -21,7 +21,7 @@ class BuilderTests(unittest.TestCase):
         }
 
         expected = set(['plugin1', 'plugin2', 'plugin3'])
-        self.assertEqual(expected, builder.find_plugin_deps(p1, packages))
+        self.assertEqual(expected, base.find_plugin_deps(p1, packages))
 
 
 class ParserTests(unittest.TestCase):
