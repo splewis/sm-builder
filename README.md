@@ -66,7 +66,7 @@ For a unix-style system, you should run:
 1. Clone the repository: ``git clone https://github.com/splewis/sm-builder``
 1. Move into the repo: ``cd sm-builder``
 1. Install python dependencies: ``sudo pip install -r requirements.txt``
-1. Install it: ``python setup.py install``
+1. Install it: ``sudo python setup.py install``
 1. You're done! You can now invoke ``smbuilder`` on the command line.
 
 It's also a good idea to have a ``spcomp`` in the system path, otherwise you will need to set the compiler as a flag (see below). For example, since my sourcemod compiler ``spcomp`` is in ``/home/splewis/sm-1.7/scripting``, I have this in my .bashrc:
