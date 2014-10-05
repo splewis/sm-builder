@@ -10,5 +10,6 @@ setup(
     scripts=['scripts/smbuilder'],
     packages=['smbuilder'],
     package_dir={'smbuilder': 'src/smbuilder'},
+    package_data={'smbuilder': ['plugins/*']},
     requirements=['jinja2'],
 )
