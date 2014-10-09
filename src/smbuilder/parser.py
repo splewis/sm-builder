@@ -67,13 +67,14 @@ def register_include(path):
     Registers an include, adding any files from that include
     to the global data structures.
     """
+    global DirectoryStack
+
     if path == 'stocks':
         # TODO: setuptools has a better notion of package data files,
         # so it might be worth looking into using that later.
         dirpath = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(dirpath, 'plugins')
 
-    global DirectoryStack
     abspath = os.path.abspath(path)
     if abspath not in IncludedPaths:
         DirectoryStack.append(path)

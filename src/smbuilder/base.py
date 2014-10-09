@@ -46,8 +46,9 @@ class PluginContainer:
                     cmd, shell=True, stderr=subprocess.STDOUT)
                 return True
             except subprocess.CalledProcessError:
-                err_msg = 'Failed to compile {}, from {}'
-                util.error(err_msg.format(self.name, self.smbuildfile))
+                msg = 'Failed to compile {}, from {}'
+                util.error(msg.format(self.name, self.smbuildfile))
+
         else:
             return False
 
@@ -126,9 +127,11 @@ def build_package(package, package_dir, packages, plugins):
         util.mkdir(filegroup_out_dir)
         for f in package.filegroups[filegroup]:
             if os.path.isdir(f):
-                util.error(
-                    'Only files may be put in filegroups: {}'.format(f))
-            shutil.copy2(f, filegroup_out_dir)
+                util.copytree()
+                # util.error(
+                #     'Only files may be put in filegroups: {}'.format(f))
+            else:
+                shutil.copy2(f, filegroup_out_dir)
 
     util.safe_copytree(package.configs, config_dir)
     util.safe_copytree(package.translations, translation_dir)

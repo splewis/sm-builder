@@ -6,6 +6,13 @@ import os
 import unittest
 
 
+def test_package():
+    dirpath = os.path.dirname(os.path.realpath(__file__))
+    target = os.path.join(dirpath, 'testpackages', 'test_package')
+    return target
+
+
+
 class BuilderTests(unittest.TestCase):
     def test_find_plugin_deps(self):
         def fake_package(name, plugins):
@@ -25,7 +32,15 @@ class BuilderTests(unittest.TestCase):
 
 
 class ParserTests(unittest.TestCase):
-    pass
+    def test_examples(self):
+        target = test_package()
+        parser.parse_configs(target)
+
+        packages = sorted(['test_package'])
+        plugins = sorted(['test_plugin', 'test_plugin2'])
+
+        self.assertEqual(packages, sorted(parser.Packages.keys()))
+        self.assertEqual(plugins, sorted(parser.Plugins.keys()))
 
 
 class BaseTests(unittest.TestCase):
@@ -48,8 +63,7 @@ class BaseTests(unittest.TestCase):
 
 class OverallTest(unittest.TestCase):
     def test_overall(self):
-        dirpath = os.path.dirname(os.path.realpath(__file__))
-        target = os.path.join(dirpath, 'testpackages', 'test_package')
+        target = test_package()
         builder.perform_builds(target, compiler='spcomp')
 
 
