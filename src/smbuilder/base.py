@@ -128,8 +128,6 @@ def build_package(package, package_dir, packages, plugins):
         for f in package.filegroups[filegroup]:
             if os.path.isdir(f):
                 util.copytree()
-                # util.error(
-                #     'Only files may be put in filegroups: {}'.format(f))
             else:
                 shutil.copy2(f, filegroup_out_dir)
 
