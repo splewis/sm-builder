@@ -22,7 +22,7 @@ class PluginContainer:
         self.source_dir = os.path.relpath(os.path.dirname(source), '.')
         self.source_files = set()
 
-    def compile(self, compiler, output_dir):
+    def compile(self, compiler, output_dir, flags):
         """Compiles, if needed the plugin and returns whether it was compiled."""
         if self.binary:
             shutil.copyfile(self.binary, output_dir)
@@ -36,21 +36,47 @@ class PluginContainer:
         if os.path.exists(binary_file_name):
             latest_binary_change = os.path.getmtime(binary_file_name)
 
+        error_filename = os.path.join(output_dir, self.name + '.txt')
+
+        def get_error_text():
+            error_text = None
+            if os.path.exists(error_filename):
+                with open(error_filename) as f:
+                    error_text = f.read()
+            return error_text
+
         if latest_source_change > latest_binary_change:
-            cmd = '{0} {1} -o={2}'.format(compiler,
-                                          self.source,
-                                          os.path.join(output_dir, self.name))
+            cmd = '{} {} {} -o={} -e={}'.format(compiler,
+                                             self.source,
+                                             flags,
+                                             os.path.join(output_dir, self.name),
+                                             error_filename)
             try:
+                # clear the previous error output file
+                if os.path.exists(error_filename):
+                    os.remove(error_filename)
+
+                # run the actual command
                 print(cmd)
                 subprocess.check_call(
                     cmd, shell=True, stderr=subprocess.STDOUT)
+
+                text = get_error_text()
+                if text:
+                    util.warning(text)
+
                 return True
+
             except subprocess.CalledProcessError:
-                msg = 'Failed to compile {}, from {}'
-                util.error(msg.format(self.name, self.smbuildfile))
+                msg = 'Failed to compile {}, from {}\n{}'
+                util.error(msg.format(self.name, self.smbuildfile, get_error_text()))
 
         else:
+            text = get_error_text()
+            if text:
+                util.warning(text)
             return False
+
 
 
 class PackageContainer:

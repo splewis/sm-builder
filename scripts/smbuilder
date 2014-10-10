@@ -22,13 +22,16 @@ def main():
     parser.add_argument('--filelist', action='store_true')
     args = parser.parse_args()
 
+    # TODO: find a way to set flags (from a smbuild file? command line? both?)
+    flags = ''
+
     if not args.target:
         args.target ='.'
 
     if args.target == 'clean':
         clean()
     else:
-        smbuilder.builder.perform_builds(args.target, args.compiler, args.filelist)
+        smbuilder.builder.perform_builds(args.target, args.compiler, args.filelist, flags)
 
 
 if __name__ == '__main__':

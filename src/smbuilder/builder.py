@@ -8,14 +8,14 @@ import os
 OUTPUT_DIR = 'builds'
 
 
-def perform_builds(target='.', compiler='spcomp', filelist=False):
+def perform_builds(target='.', compiler='spcomp', filelist=False, flags=''):
     """Main library entrance to build packages."""
     plugins, packages = parser.parse_configs(target)
     smbuildfile = os.path.join(target, parser.CONFIG_NAME)
     build(smbuildfile, compiler, filelist, plugins, packages)
 
 
-def build(smbuildfile, compiler, filelist, plugins, packages):
+def build(smbuildfile, compiler, filelist, plugins, packages, flags=''):
     """Performs the entire build process."""
     # setup directory structure, execute user-configurationsz
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
@@ -53,7 +53,7 @@ def build(smbuildfile, compiler, filelist, plugins, packages):
     compiled_count = 0
     for name in plugins_to_compile:
         plugin = plugins[name]
-        if plugin.compile(compiler, plugin_build_dir):
+        if plugin.compile(compiler, plugin_build_dir, flags):
             compiled_count += 1
 
     # build packages
