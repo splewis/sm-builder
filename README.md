@@ -23,7 +23,7 @@ The config files are just python files, with a syntax inspired by Google's [Blaz
 - Convention over configuration
 - Simple configuration syntax
 - User friendly (especially when presenting errors - avoid python stack traces!)
-- Useful to both public-plugin developers and server administrators
+- Useful to both plugin developers and server administrators
 
 
 ## A brief example
@@ -82,6 +82,9 @@ Windows support **may** come later. It shouldn't take much to get it to work, bu
 
 - ``smbuilder`` will run the smbuild file in the current directory.
 - ``smbuilder <target>`` will run the smbuild file in the given target directory
+- ``smbuilder clean`` will clean all previous builds
+
+Note that the output is always in the ``builds`` directory.
 
 #### Flags:
 - ``--compiler (-c)`` specifies a sourcepawn compiler to use (default: spcomp)

@@ -16,7 +16,7 @@ def clean():
 def main():
     parser = argparse.ArgumentParser(
         description='A sourcemod build and packaging tool.')
-    parser.add_argument('target', nargs='?')
+    parser.add_argument('target', nargs='?', default='.')
     parser.add_argument('-c', '--compiler', default='spcomp',
                         help='Sourcepawn compiler to use.')
     parser.add_argument('--filelist', action='store_true')
@@ -24,9 +24,6 @@ def main():
 
     # TODO: find a way to set flags (from a smbuild file? command line? both?)
     flags = ''
-
-    if not args.target:
-        args.target ='.'
 
     if args.target == 'clean':
         clean()

@@ -42,7 +42,7 @@ class PluginContainer:
             error_text = None
             if os.path.exists(error_filename):
                 with open(error_filename) as f:
-                    error_text = f.read()
+                    error_text = f.read().strip()
             return error_text
 
         if latest_source_change > latest_binary_change:
