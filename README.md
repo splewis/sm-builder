@@ -72,11 +72,7 @@ For a unix-style system, you should run:
 1. Install smbuiler: ``sudo python setup.py install``
 1. You're done! You can now invoke ``smbuilder`` on the command line.
 
-It's also a good idea to have a ``spcomp`` in the system path, otherwise you will need to set the compiler as a flag (see below). For example, since my sourcemod compiler ``spcomp`` is in ``/home/splewis/sm-1.7/scripting``, I have this in my .bashrc:
-
-```
-PATH+=":/home/splewis/sm-1.7/scripting"
-```
+You may still need to configure a SourcePawn compiler, so read on below for how to do that.
 
 Windows support **may** come later. It shouldn't take much to get it to work, but there may be small issues to work out before I can claim it works on windows.
 
@@ -89,8 +85,21 @@ Windows support **may** come later. It shouldn't take much to get it to work, bu
 
 Note that the output is always in the ``builds`` directory.
 
-#### Flags:
-- ``--compiler (-c)`` specifies a sourcepawn compiler to use (default: spcomp)
+#### Flags and settings:
+
+The first time the program is run, it will produce a file in a user-config directory. For linux, this will generally be ``~/.config/smbuilder.ini``.
+
+Example first run:
+```
+splewis-laptop csgo-retakes $ smbuilder
+Settings written to /home/splewis/.config/smbuilder.ini
+```
+
+You can also set things from command line flags (these overrule the config file settings):
+- ``--compiler (-c)`` specifies a sourcepawn compiler to use (default: ``spcomp``)
+
+You may want to add the path of of your sourcemod compiler to the system path, something like:
+``PATH+=":/home/splewis/sm/addons/sourcemod/scripting"``
 
 
 ## Examples

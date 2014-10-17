@@ -8,14 +8,14 @@ import os
 OUTPUT_DIR = 'builds'
 
 
-def perform_builds(target='.', compiler='spcomp', filelist=False, flags=''):
+def perform_builds(target='.', compiler='spcomp', flags=''):
     """Main library entrance to build packages."""
     plugins, packages = parser.parse_configs(target)
     smbuildfile = os.path.join(target, parser.CONFIG_NAME)
-    build(smbuildfile, compiler, filelist, plugins, packages)
+    build(smbuildfile, compiler, plugins, packages)
 
 
-def build(smbuildfile, compiler, filelist, plugins, packages, flags=''):
+def build(smbuildfile, compiler, plugins, packages, flags=''):
     """Performs the entire build process."""
     # setup directory structure, execute user-configurationsz
     plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
@@ -60,7 +60,7 @@ def build(smbuildfile, compiler, filelist, plugins, packages, flags=''):
     for name in packages_to_build:
         package = packages[name]
         print('Building package {}'.format(name))
-        package.create(OUTPUT_DIR, filelist, packages, plugins)
+        package.create(OUTPUT_DIR, packages, plugins)
 
     if len(plugins) == 0:
         util.warning('No plugins were found in {}.'.format(

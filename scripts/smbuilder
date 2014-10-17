@@ -4,8 +4,53 @@ import smbuilder.builder
 import smbuilder.parser
 
 import argparse
+import ConfigParser
 import os
 import shutil
+
+import appdirs
+
+
+class SMBuilderSettings:
+    def __init__(self):
+        # default values
+        self.settings = {
+            'compiler' : 'spcomp'
+        }
+        self._create_settings_file()
+
+        filename = self._get_cfg_file()
+        try:
+            parser = ConfigParser.ConfigParser()
+            parser.read(filename)
+            items = parser.items('Settings')
+            for key, value in items:
+                self.settings[key] = value
+        except ConfigParser.NoSectionError:
+            pass
+
+    def add_arg(self, key, value=None):
+        if value:
+            self.settings[key] = value
+
+    def __getitem__(self, key):
+        return self.settings[key]
+
+    def _create_settings_file(self):
+        filename = self._get_cfg_file()
+        if not os.path.exists(filename):
+            parser = ConfigParser.ConfigParser()
+            parser.add_section('Settings')
+            for key in self.settings:
+                parser.set('Settings', key, self.settings[key])
+            with open(filename, 'w') as f:
+                parser.write(f)
+            print('Settings written to {}'.format(filename))
+
+
+    def _get_cfg_file(self):
+        dirs = appdirs.AppDirs('smbuilder', 'Sean Lewis')
+        return dirs.user_config_dir + '.ini'
 
 
 def clean():
@@ -14,21 +59,23 @@ def clean():
 
 
 def main():
+    settings = SMBuilderSettings()
+
     parser = argparse.ArgumentParser(
         description='A sourcemod build and packaging tool.')
     parser.add_argument('target', nargs='?', default='.')
-    parser.add_argument('-c', '--compiler', default='spcomp',
-                        help='Sourcepawn compiler to use.')
-    parser.add_argument('--filelist', action='store_true')
+    parser.add_argument('-c', '--compiler', help='Sourcepawn compiler to use.')
     args = parser.parse_args()
 
     # TODO: find a way to set flags (from a smbuild file? command line? both?)
     flags = ''
 
+    settings.add_arg('compiler', args.compiler)
+
     if args.target == 'clean':
         clean()
     else:
-        smbuilder.builder.perform_builds(args.target, args.compiler, args.filelist, flags)
+        smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
 
 
 if __name__ == '__main__':
