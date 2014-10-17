@@ -53,11 +53,6 @@ class SMBuilderSettings:
         return dirs.user_config_dir + '.ini'
 
 
-def clean():
-    if os.path.exists(smbuilder.builder.OUTPUT_DIR):
-        shutil.rmtree(smbuilder.builder.OUTPUT_DIR)
-
-
 def main():
     settings = SMBuilderSettings()
 
@@ -72,10 +67,7 @@ def main():
 
     settings.add_arg('compiler', args.compiler)
 
-    if args.target == 'clean':
-        clean()
-    else:
-        smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
+    smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
 
 
 if __name__ == '__main__':

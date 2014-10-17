@@ -5,21 +5,19 @@ import util
 import os
 
 
-OUTPUT_DIR = 'builds'
-
-
 def perform_builds(target='.', compiler='spcomp', flags=''):
     """Main library entrance to build packages."""
     plugins, packages = parser.parse_configs(target)
+    output_dir = os.path.join(target, 'builds')
     smbuildfile = os.path.join(target, parser.CONFIG_NAME)
-    build(smbuildfile, compiler, plugins, packages)
+    build(smbuildfile, compiler, plugins, packages, flags=flags, output_dir=output_dir)
 
 
-def build(smbuildfile, compiler, plugins, packages, flags=''):
+def build(smbuildfile, compiler, plugins, packages, flags='', output_dir='builds'):
     """Performs the entire build process."""
-    # setup directory structure, execute user-configurationsz
-    plugin_build_dir = os.path.join(OUTPUT_DIR, 'plugins')
-    util.mkdir(OUTPUT_DIR)
+    # setup directory structure, execute user-configurations
+    plugin_build_dir = os.path.join(output_dir, 'plugins')
+    util.mkdir(output_dir)
     util.mkdir(plugin_build_dir)
 
     # scan deps for what we need to do
@@ -60,7 +58,7 @@ def build(smbuildfile, compiler, plugins, packages, flags=''):
     for name in packages_to_build:
         package = packages[name]
         print('Building package {}'.format(name))
-        package.create(OUTPUT_DIR, packages, plugins)
+        package.create(output_dir, packages, plugins)
 
     if len(plugins) == 0:
         util.warning('No plugins were found in {}.'.format(

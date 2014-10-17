@@ -133,7 +133,7 @@ def build_package(package, package_dir, packages, plugins):
             util.error(err_msg.format(package.name, p))
 
         util.mkdir(plugin_dir)
-        binary_path = os.path.join('builds', 'plugins', p + '.smx')
+        binary_path = os.path.join(package_dir, '..', 'plugins', p + '.smx')
         shutil.copy2(binary_path, plugin_dir)
         for source_file in plugins[p].source_files:
             source_path = os.path.join(plugins[p].source_dir, source_file)
