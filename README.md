@@ -81,7 +81,6 @@ Windows support **may** come later. It shouldn't take much to get it to work, bu
 
 - ``smbuilder`` will run the smbuild file in the current directory.
 - ``smbuilder <target>`` will run the smbuild file in the given target directory
-- ``smbuilder clean`` will clean all previous builds
 
 Note that the output is always in the ``builds`` directory.
 

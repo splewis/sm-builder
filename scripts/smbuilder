@@ -50,7 +50,7 @@ class SMBuilderSettings:
 
     def _get_cfg_file(self):
         dirs = appdirs.AppDirs('smbuilder', 'Sean Lewis')
-        return dirs.user_config_dir + '.ini'
+        return os.path.join(dirs.user_config_dir, 'settings.ini')
 
 
 def main():

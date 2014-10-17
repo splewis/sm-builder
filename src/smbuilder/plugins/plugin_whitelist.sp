@@ -13,7 +13,15 @@ public Plugin:myinfo = {
     url = "github.com/splewis/sm-builder"
 };
 
+public OnMapStart() {
+    RemovePlugins();
+}
+
 public OnMapEnd() {
+    RemovePlugins();
+}
+
+public void RemovePlugins() {
     Handle toRemove = GetPluginsToRemove();
     char plugin[PLUGIN_NAME_LENGTH];
     for (int i = 0; i < GetArraySize(toRemove); i++) {
@@ -116,6 +124,8 @@ static void RemoveRegexMatches(Handle pluginList, char regex[PLUGIN_NAME_LENGTH]
             i--;
         }
     }
+
+    CloseHandle(compiledRegex);
 }
 
 // Adapted from DarthNinja's plugin EnableDisable plugin:
