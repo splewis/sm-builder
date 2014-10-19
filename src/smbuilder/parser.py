@@ -162,7 +162,8 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
         data = os.path.join(current_path, data)
 
     Packages[name] = base.PackageContainer(
-        name, plugins, filegroups, extends, cfg, configs, translations, data, gamedata, smbuildfile, template_files, args)
+        name, plugins, filegroups, extends, cfg, configs,
+        translations, data, gamedata, smbuildfile, template_files, args)
 
 
 def glob_files(file_list, name, warn_on_empty=False):

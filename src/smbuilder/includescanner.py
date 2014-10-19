@@ -2,9 +2,13 @@ import util
 
 import os
 
+
 # TODO: guard against infinite loops (detect cycles early)
 def find_last_time_modified(filename):
-    "Finds the latest time this source file was modified, including all includes."
+    """
+    Finds the latest time this source file was modified,
+    including all includes.
+    """
     visited = set([filename])
     time = _find_last_time_modified(filename, visited)
     base = os.path.dirname(filename)

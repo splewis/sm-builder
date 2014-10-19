@@ -12,7 +12,6 @@ def test_package():
     return target
 
 
-
 class BuilderTests(unittest.TestCase):
     def test_find_plugin_deps(self):
         def fake_package(name, plugins):
@@ -65,7 +64,6 @@ class OverallTest(unittest.TestCase):
     def test_overall(self):
         target = test_package()
         builder.perform_builds(target, compiler='spcomp')
-
 
 
 if __name__ == "__main__":

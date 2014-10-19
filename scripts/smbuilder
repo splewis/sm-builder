@@ -62,12 +62,13 @@ def main():
     parser.add_argument('-c', '--compiler', help='Sourcepawn compiler to use.')
     args = parser.parse_args()
 
-    # TODO: find a way to set flags (from a smbuild file? command line? both?)
-    flags = ''
-
-    settings.add_arg('compiler', args.compiler)
-
-    smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
+    if args.target == 'config':
+        print(settings._get_cfg_file())
+    else:
+        # TODO: find a way to set flags (from a smbuild file? command line? both?)
+        flags = ''
+        settings.add_arg('compiler', args.compiler)
+        smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
 
 
 if __name__ == '__main__':

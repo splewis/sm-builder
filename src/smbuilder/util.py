@@ -21,7 +21,6 @@ def mkdir(*args):
         os.makedirs(path)
 
 
-# Taken from http://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
 def copytree(src, dst):
     """Copies a tree of files to a destination."""
     if not os.path.exists(dst):
@@ -64,7 +63,6 @@ def file_to_plugin_name(filename):
     return os.path.splitext(plugin_name)[0]
 
 
-# Taken from http://stackoverflow.com/questions/287871/print-in-terminal-with-colors-using-python
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'

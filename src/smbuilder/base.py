@@ -46,11 +46,10 @@ class PluginContainer:
             return error_text
 
         if latest_source_change > latest_binary_change:
-            cmd = '{} {} {} -o={} -e={}'.format(compiler,
-                                             self.source,
-                                             flags,
-                                             os.path.join(output_dir, self.name),
-                                             error_filename)
+            out = os.path.join(output_dir, self.name)
+            cmd = '{} {} {} -o={} -e={}'
+            cmd = format.format(compiler, self.source, flags, out, error_filename)
+
             try:
                 # clear the previous error output file
                 if os.path.exists(error_filename):

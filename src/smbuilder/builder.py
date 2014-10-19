@@ -39,7 +39,8 @@ def build(smbuildfile, compiler, plugins, packages, flags='', output_dir='builds
             # also make sure plugin dependencies are met by the package
             for dep in plugins[plugin_name].deps:
                 if dep not in for_this_package:
-                    msg = 'Plugin {} depends on {}, but is not part of package {}'.format(plugin_name, dep, name)
+                    msg = 'Plugin {} depends on {}, but is not part of package {}'
+                    msg = msg.format(plugin_name, dep, name)
                     util.warning(msg)
 
     # also compile any plugins from this smbuildfile
@@ -65,4 +66,3 @@ def build(smbuildfile, compiler, plugins, packages, flags='', output_dir='builds
             os.path.join(config_dir, CONFIG_NAME)))
     elif compiled_count == 0:
         print('All plugins up to date.')
-
