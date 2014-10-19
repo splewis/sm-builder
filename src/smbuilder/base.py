@@ -48,7 +48,7 @@ class PluginContainer:
         if latest_source_change > latest_binary_change:
             out = os.path.join(output_dir, self.name)
             cmd = '{} {} {} -o={} -e={}'
-            cmd = format.format(compiler, self.source, flags, out, error_filename)
+            cmd = cmd.format(compiler, self.source, flags, out, error_filename)
 
             try:
                 # clear the previous error output file
