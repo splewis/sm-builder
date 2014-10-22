@@ -125,6 +125,7 @@ Registering a ``Plugin`` have the following named arguments:
 Registering a ``Package`` has the following named arguments:
 - ``name``: **required**, unique name that identifies the package
 - ``plugins``: list of plugin names the package contains
+- ``disabled_plugins``: list of plugin names that should be disabled (not inherited)
 - ``extends``: inherited base packages
 - ``cfg``: directory name to bring files into the package ``cfg`` directory
 - ``configs``: directory name to bring files from ``addons/sourcemod/configs`` from

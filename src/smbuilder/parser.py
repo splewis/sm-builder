@@ -112,7 +112,7 @@ def register_plugin(name=None, source=None, deps=None, binary=None):
     Plugins[name] = base.PluginContainer(name, source_path, binary, smbuildfile, deps)
 
 
-def register_package(name=None, plugins=None, filegroups=None, extends=None,
+def register_package(name=None, plugins=None, disabled_plugins=None, filegroups=None, extends=None,
                      sources=None, template_files=None, args=None,
                      cfg='cfg', configs='configs', gamedata='gamedata',
                      translations='translations', data='data'):
@@ -135,6 +135,8 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
 
     if not plugins:
         plugins = []
+    if not disabled_plugins:
+        disabled_plugins = []
     if not extends:
         extends = []
     if not template_files:
@@ -163,7 +165,7 @@ def register_package(name=None, plugins=None, filegroups=None, extends=None,
 
     Packages[name] = base.PackageContainer(
         name, plugins, filegroups, extends, cfg, configs,
-        translations, data, gamedata, smbuildfile, template_files, args)
+        translations, data, gamedata, smbuildfile, template_files, args, disabled_plugins)
 
 
 def glob_files(file_list, name, warn_on_empty=False):

@@ -81,7 +81,7 @@ class PluginContainer:
 class PackageContainer:
     """Wrapper that represents a package: a collection of plugins and files."""
     def __init__(self, name, plugins, filegroups, extends_list, cfg, configs,
-                 translations, data, gamedata, smbuildfile, template_files, template_args):
+                 translations, data, gamedata, smbuildfile, template_files, template_args, disabled):
         self.name = name
         self.plugins = plugins
         self.filegroups = filegroups
@@ -94,6 +94,7 @@ class PackageContainer:
         self.smbuildfile = smbuildfile
         self.template_files = template_files
         self.template_args = template_args
+        self.disabled = disabled
 
     def create(self, output_dir, packages, plugins):
         """Creates the package output."""
@@ -104,6 +105,16 @@ class PackageContainer:
         util.mkdir(package_dir)
         build_package(self, package_dir, packages, plugins)
         replace_args(self, package_dir, packages, plugins)
+
+        # deal with any plugins supposed to be disabled
+        plugin_dir = os.path.join(package_dir, 'addons', 'sourcemod', 'plugins')
+        disabled_dir = os.path.join(package_dir, 'addons', 'sourcemod', 'plugins', 'disabled')
+        if self.disabled:
+            util.mkdir(disabled_dir)
+            for p in self.disabled:
+                src = os.path.join(plugin_dir, plugins[p].name + '.smx')
+                dst = os.path.join(disabled_dir, plugins[p].name + '.smx')
+                shutil.move(src, dst)
 
 
 def build_package(package, package_dir, packages, plugins):
