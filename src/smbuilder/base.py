@@ -112,6 +112,10 @@ class PackageContainer:
         if self.disabled:
             util.mkdir(disabled_dir)
             for p in self.disabled:
+                if plugins[p].name not in self.plugins:
+                    msg = 'Package {} uses disables plugin {}, which it does not contain'
+                    util.error(msg.format(self.name, p))
+
                 src = os.path.join(plugin_dir, plugins[p].name + '.smx')
                 dst = os.path.join(disabled_dir, plugins[p].name + '.smx')
                 shutil.move(src, dst)
