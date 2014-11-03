@@ -54,6 +54,12 @@ class SMBuilderSettings:
         return dirs.user_config_dir + '.ini'
 
 
+def clean():
+    output_dir = 'builds'
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+
+
 def main():
     settings = SMBuilderSettings()
 
@@ -65,6 +71,8 @@ def main():
 
     if args.target == 'config':
         print(settings._get_cfg_file())
+    elif args.target == 'clean':
+        clean()
     else:
         # TODO: find a way to set flags (from a smbuild file? command line? both?)
         flags = ''
