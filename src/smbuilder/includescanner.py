@@ -31,6 +31,12 @@ def _find_last_time_modified(filename, visited):
                     elif arg.startswith('\"'):
                         include_file = arg.replace('\"', '')
                         include_file = os.path.join(os.path.dirname(filename), include_file)
+
+                        # dirty hack to allow include of things without filenames
+                        name, extension = os.path.splitext(include_file)
+                        if not extension:
+                            include_file += '.inc'
+
                         to_read.append(include_file)
                         visited.add(include_file)
 

@@ -62,7 +62,6 @@ def build(smbuildfile, compiler, plugins, packages, flags='', output_dir='builds
         package.create(output_dir, packages, plugins)
 
     if len(plugins) == 0:
-        util.warning('No plugins were found in {}.'.format(
-            os.path.join(config_dir, CONFIG_NAME)))
+        util.warning('No plugins were found in {}.'.format(smbuildfile))
     elif compiled_count == 0:
         print('All plugins up to date.')

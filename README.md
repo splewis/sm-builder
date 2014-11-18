@@ -18,8 +18,7 @@
 - Doesn't manage your install of the sourcemod compiler or 3rd party include files
 - Doesn't do anything with extensions
 
-
-The config files are just python files, with a syntax inspired by Google's [Blaze](http://google-engtools.blogspot.fr/2011/08/build-in-cloud-how-build-system-works.html) tool.
+The config files are just python files, so you can use any python syntax you want in them.
 
 #### General philosophy:
 - Convention over configuration
