@@ -1,8 +1,9 @@
 import base
 import util
 
-import os
+import fnmatch
 import glob
+import os
 
 
 CONFIG_NAME = 'smbuild'
@@ -39,6 +40,10 @@ def glob_plugins(pattern):
         register_plugin(source=source_file)
 
 
+def list_glob_plugins(pattern):
+    return list(filter(lambda x: fnmatch.fnmatch(x, pattern), Plugins.keys()))
+
+
 def execute_config(dir_path):
     """
     Executes an smbuild configuration file.
@@ -50,6 +55,7 @@ def execute_config(dir_path):
             'Plugin': register_plugin,
             'Package': register_package,
             'GlobPlugins': glob_plugins,
+            'Plugins': list_glob_plugins,
         }
         with open(filename) as f:
             exec(f.read(), context)
