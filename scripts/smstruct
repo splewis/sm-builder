@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+import smbuilder.structbuilder
+import smbuilder.util
+
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='A sourcemod struct include generator')
+    parser.add_argument('input', nargs='+', help='Input files to read from')
+    parser.add_argument('-o', '--output', default='.', help='Output location for the includes')
+    args = parser.parse_args()
+
+    try:
+        smbuilder.structbuilder.create_includes(args.input, args.output)
+    except Exception as e:
+        smbuilder.util.error(str(e))
+
+
+if __name__ == '__main__':
+    main()

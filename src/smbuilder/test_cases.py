@@ -1,6 +1,7 @@
 import base
 import builder
 import parser
+import structbuilder
 
 import os
 import unittest
@@ -64,6 +65,133 @@ class OverallTest(unittest.TestCase):
     def test_overall(self):
         target = test_package()
         builder.perform_builds(target, compiler='spcomp')
+
+
+class StructTests(unittest.TestCase):
+    def test_text(self):
+        name='MyStruct'
+        fields=[
+            ('a', 'int'),
+            ('b', 'float'),
+            ('c', 'char'),
+            ('d', 'int[4]'),
+        ]
+
+        expected_output = ("""
+#define CreateMyStruct() MyStruct:MyStruct_New()
+#define MyStructFromArray(%1,%2) (MyStruct:GetArrayCell(%1, %2))
+
+stock Handle MyStruct_New() {
+    Handle dataList = CreateArray();
+    PushArrayCell(dataList, 0);
+    PushArrayCell(dataList, 0.0);
+    PushArrayCell(dataList, 0);
+    for(int i = 0; i < 4; i++)
+        PushArrayCell(dataList, 0);
+    return dataList;
+}
+
+stock int MyStruct_GetA(Handle mystruct_) {
+    return GetArrayCell(mystruct_, 0);
+}
+
+stock float MyStruct_GetB(Handle mystruct_) {
+    return GetArrayCell(mystruct_, 1);
+}
+
+stock char MyStruct_GetC(Handle mystruct_) {
+    return GetArrayCell(mystruct_, 2);
+}
+
+stock void MyStruct_GetD(Handle mystruct_, int buffer[4]) {
+    for (int i = 0; i < 4; i++)
+        buffer[i] = GetArrayCell(mystruct_, i + 3);
+}
+
+stock void MyStruct_SetA(Handle mystruct_, int value) {
+    SetArrayCell(mystruct_, 0, value);
+}
+
+stock void MyStruct_SetB(Handle mystruct_, float value) {
+    SetArrayCell(mystruct_, 1, value);
+}
+
+stock void MyStruct_SetC(Handle mystruct_, char value) {
+    SetArrayCell(mystruct_, 2, value);
+}
+
+stock void MyStruct_SetD(Handle mystruct_, const int value[4]) {
+    for (int i = 0; i < 4; i++)
+        SetArrayCell(mystruct_, i + 3, value[i]);
+}
+
+methodmap MyStruct < Handle {
+    public int GetA() {
+        return MyStruct_GetA(this);
+    }
+
+    public void SetA(int x_) {
+        MyStruct_SetA(this, x_);
+    }
+
+    property int a {
+        public set() = MyStruct_SetA;
+        public get() = MyStruct_GetA;
+    }
+
+    public float GetB() {
+        return MyStruct_GetB(this);
+    }
+
+    public void SetB(float x_) {
+        MyStruct_SetB(this, x_);
+    }
+
+    property float b {
+        public set() = MyStruct_SetB;
+        public get() = MyStruct_GetB;
+    }
+
+    public char GetC() {
+        return MyStruct_GetC(this);
+    }
+
+    public void SetC(char x_) {
+        MyStruct_SetC(this, x_);
+    }
+
+    property char c {
+        public set() = MyStruct_SetC;
+        public get() = MyStruct_GetC;
+    }
+
+    public void GetD(int buffer[4]) {
+        MyStruct_GetD(this, buffer);
+    }
+
+    public void SetD(const int value[4]) {
+        MyStruct_SetD(this, value);
+    }
+
+}""")
+
+        def clean_code(code):
+            tmp = code.strip()
+            tmp.replace('\t', '    ')
+            return tmp
+
+        actual_output = structbuilder.get_struct_code(name, fields)
+
+        actual_list = actual_output.strip().split('\n')
+        expected_list = expected_output.strip().split('\n')
+        self.assertEqual(len(actual_list), len(expected_list))
+
+        for i in range(0, len(actual_list)):
+            actual = clean_code(actual_list[i])
+            expected = clean_code(expected_list[i])
+            self.assertEqual(actual, expected)
+
+        self.assertEqual(clean_code(actual_output), clean_code(expected_output))
 
 
 if __name__ == "__main__":
