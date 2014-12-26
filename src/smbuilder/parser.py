@@ -62,10 +62,12 @@ def execute_config(dir_path):
             try:
                 exec(f.read(), context)
             except Exception as e:
-                util.error(
-                    'There is a syntax error in {}\n{}'.format(filename, e))
+                msg = 'There is a syntax error in {}\n{}'.format(filename, e)
+                raise SyntaxError(msg)
+
     else:
-        util.error('Config file does not exist: {}'.format(filename))
+        msg = 'Config file does not exist: {}'.format(filename)
+        raise IOError(msg)
 
 
 def register_include(path):
@@ -95,7 +97,7 @@ def register_plugin(name=None, source=None, deps=None, binary=None):
     """
     if source and binary:
         msg = 'the source and binary fields cannot be used together in a plugin'
-        util.error(msg)
+        raise ValueError(msg)
     if source:
         if not name:
             name = util.file_to_plugin_name(source)
@@ -103,10 +105,12 @@ def register_plugin(name=None, source=None, deps=None, binary=None):
         if not name:
             name = util.file_to_plugin_name(binary)
     else:
-        util.error('All plugins must define a source or a binary')
+        msg = 'Plugin {} does not define either a source or a binary'.format(name)
+        raise ValueError(msg)
 
     if name in Plugins:
-        util.error('duplicated plugin name {}'.format(name))
+        msg = 'duplicated plugin name {}'.format(name)
+        raise ValueError(msg)
 
     current_path = os.path.join(*DirectoryStack)
     source_path = os.path.join(current_path, source)
@@ -127,11 +131,11 @@ def register_package(name=None, plugins=None, disabled_plugins=None, filegroups=
     The name field is mandatory.
     """
     if not name:
-        util.error('Packages must specify a name')
+        raise ValueError('Packages must specify a name')
     if name in Packages:
-        util.error('duplicated package name {}'.format(name))
+        raise ValueError('duplicated package name {}'.format(name))
     if name == 'plugins':
-        util.error('Illegal package name: {}'.format(name))
+        raise ValueError('Illegal package name: {}'.format(name))
 
     if filegroups:
         for dir in filegroups:

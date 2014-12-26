@@ -77,7 +77,12 @@ def main():
         # TODO: find a way to set flags (from a smbuild file? command line? both?)
         flags = ''
         settings.add_arg('compiler', args.compiler)
-        smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
+
+        try:
+            smbuilder.builder.perform_builds(args.target, settings['compiler'], flags)
+        except Exception as e:
+            smbuilder.util.error(str(e))
+
 
 
 if __name__ == '__main__':

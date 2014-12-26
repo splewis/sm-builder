@@ -34,7 +34,7 @@ def build(smbuildfile, compiler, plugins, packages, flags='', output_dir='builds
 
             if plugin_name not in plugins:
                 err = 'Package {} uses plugin {}, but it does not exist'.format(name, plugin_name)
-                util.error(err)
+                raise ValueError(err)
 
             # also make sure plugin dependencies are met by the package
             for dep in plugins[plugin_name].deps:
