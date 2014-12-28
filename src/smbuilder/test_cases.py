@@ -108,6 +108,10 @@ stock void MyStruct_GetD(Handle mystruct_, int buffer[4]) {
         buffer[i] = GetArrayCell(mystruct_, i + 3);
 }
 
+stock void MyStruct_GetDAt(Handle mystruct_, int index) {
+    return GetArrayCell(mystruct_, index + 3);
+}
+
 stock void MyStruct_SetA(Handle mystruct_, int value) {
     SetArrayCell(mystruct_, 0, value);
 }
@@ -123,6 +127,10 @@ stock void MyStruct_SetC(Handle mystruct_, char value) {
 stock void MyStruct_SetD(Handle mystruct_, const int value[4]) {
     for (int i = 0; i < 4; i++)
         SetArrayCell(mystruct_, i + 3, value[i]);
+}
+
+stock void MyStruct_SetDAt(Handle mystruct_, int value, int index) {
+    SetArrayCell(mystruct_, index + 3, value);
 }
 
 methodmap MyStruct < Handle {
@@ -169,8 +177,16 @@ methodmap MyStruct < Handle {
         MyStruct_GetD(this, buffer);
     }
 
+    public int GetDAt(int index) {
+        return MyStruct_GetDAt(this, index);
+    }
+
     public void SetD(const int value[4]) {
         MyStruct_SetD(this, value);
+    }
+
+    public void SetDAt(int value, int index) {
+        MyStruct_SetDAt(this, value, index);
     }
 
 }""")
@@ -184,6 +200,8 @@ methodmap MyStruct < Handle {
 
         actual_list = actual_output.strip().split('\n')
         expected_list = expected_output.strip().split('\n')
+        print actual_output
+
         self.assertEqual(len(actual_list), len(expected_list))
 
         for i in range(0, len(actual_list)):

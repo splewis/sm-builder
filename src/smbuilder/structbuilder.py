@@ -104,6 +104,11 @@ def create_struct_functions(name, elems):
             lines.append('\tfor (int i = 0; i < {}; i++)'.format(e.array_size))
             lines.append('\t\tbuffer[i] = GetArrayCell({}, i + {});'.format(struct_param_name, curr_index))
             lines.append('}')
+            lines.append('')
+
+            lines.append('stock {} {}_Get{}At(Handle {}, int index) {{'.format(e.type, function_prefix, elem_func_suffix, struct_param_name, e.type, e.array_size))
+            lines.append('\treturn GetArrayCell({}, index + {});'.format(struct_param_name, curr_index))
+            lines.append('}')
 
         else:
             lines.append('stock {} {}_Get{}(Handle {}) {{'.format(e.type, function_prefix, elem_func_suffix, struct_param_name))
@@ -124,6 +129,11 @@ def create_struct_functions(name, elems):
             lines.append('\tfor (int i = 0; i < {}; i++)'.format(e.array_size))
             lines.append('\t\tSetArrayCell({}, i + {}, value[i]);'.format(struct_param_name, curr_index))
             lines.append('}')
+            lines.append('')
+
+            lines.append('stock void {}_Set{}At(Handle {}, {} value, int index) {{'.format(function_prefix, elem_func_suffix, struct_param_name, e.type, e.array_size))
+            lines.append('\tSetArrayCell({}, index + {}, value);'.format(struct_param_name, curr_index))
+            lines.append('}')
 
         else:
             lines.append('stock void {}_Set{}(Handle {}, {} value) {{'.format(function_prefix, elem_func_suffix, struct_param_name, e.type))
@@ -137,11 +147,15 @@ def create_struct_functions(name, elems):
     lines.append('methodmap {} < Handle {{'.format(name))
 
     for e in elems:
-        # getter
         if e.is_array:
             # getter
             lines.append('\tpublic void {}({} buffer[{}]) {{'.format(e.getter_method_name, e.type, e.array_size))
             lines.append('\t\t{}(this, buffer);'.format(e.getter_function_name))
+            lines.append('\t}')
+            lines.append('')
+
+            lines.append('\tpublic {} {}At(int index) {{'.format(e.type, e.getter_method_name, e.type, e.array_size))
+            lines.append('\t\treturn {}At(this, index);'.format(e.getter_function_name))
             lines.append('\t}')
             lines.append('')
 
@@ -150,6 +164,12 @@ def create_struct_functions(name, elems):
             lines.append('\t\t{}(this, value);'.format(e.setter_function_name))
             lines.append('\t}')
             lines.append('')
+
+            lines.append('\tpublic void {}At({} value, int index) {{'.format(e.setter_method_name, e.type, e.array_size))
+            lines.append('\t\t{}At(this, value, index);'.format(e.setter_function_name))
+            lines.append('\t}')
+            lines.append('')
+
 
         else:
             # getter
