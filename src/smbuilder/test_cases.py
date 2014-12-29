@@ -108,7 +108,7 @@ stock void MyStruct_GetD(Handle mystruct_, int buffer[4]) {
         buffer[i] = GetArrayCell(mystruct_, i + 3);
 }
 
-stock void MyStruct_GetDAt(Handle mystruct_, int index) {
+stock int MyStruct_GetDAt(Handle mystruct_, int index) {
     return GetArrayCell(mystruct_, index + 3);
 }
 
