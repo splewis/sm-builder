@@ -23,7 +23,8 @@ def _find_last_time_modified(filename, visited):
             to_read = []
             lines = f.read().split('\n')
             for line in lines:
-                if '#include' in line:
+                optional = '#tryinclude' in line
+                if '#include' in line or optional:
                     arg = line.split(' ')[1].strip()
                     if arg.startswith('<'):
                         # TODO: also read system includes
@@ -41,14 +42,14 @@ def _find_last_time_modified(filename, visited):
                         visited.add(include_file)
 
             for file in to_read:
-                if not os.path.exists(file):
+                if not os.path.exists(file) and not optional:
                     util.error('Missing file: {}\n\tincluded from {}'.format(file, filename))
 
-                latest_time = max(latest_time, _find_last_time_modified(file, visited))
+                if os.path.exists(file)
+                    latest_time = max(latest_time, _find_last_time_modified(file, visited))
 
         return latest_time
 
     except OSError as e:
         print(e)
         util.error('Missing file: {}'.format(filename))
-
