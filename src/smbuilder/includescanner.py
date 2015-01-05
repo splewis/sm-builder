@@ -38,10 +38,11 @@ def _find_last_time_modified(filename, visited):
                         if not extension:
                             include_file += '.inc'
 
-                        to_read.append(include_file)
-                        visited.add(include_file)
+                        to_read.append((include_file, optional))
+                        if os.path.exists(include_file):
+                            visited.add(include_file)
 
-            for file in to_read:
+            for file, optional in to_read:
                 if not os.path.exists(file) and not optional:
                     util.error('Missing file: {}\n\tincluded from {}'.format(file, filename))
 
