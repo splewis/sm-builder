@@ -45,7 +45,7 @@ def _find_last_time_modified(filename, visited):
                 if not os.path.exists(file) and not optional:
                     util.error('Missing file: {}\n\tincluded from {}'.format(file, filename))
 
-                if os.path.exists(file)
+                if os.path.exists(file):
                     latest_time = max(latest_time, _find_last_time_modified(file, visited))
 
         return latest_time
