@@ -10,13 +10,13 @@ def find_last_time_modified(filename):
     including all includes.
     """
     visited = set([filename])
-    time = _find_last_time_modified(filename, filename, visited)
+    time = _find_last_time_modified(filename, visited)
     base = os.path.dirname(filename)
     visited = map(lambda f: os.path.relpath(f, base), visited)
     return time, visited
 
 
-def _find_last_time_modified(plugin_filename, filename, visited):
+def _find_last_time_modified(filename, visited):
     try:
         latest_time = os.path.getmtime(filename)
         with open(filename) as f:
@@ -30,7 +30,7 @@ def _find_last_time_modified(plugin_filename, filename, visited):
                         pass
                     elif arg.startswith('\"'):
                         include_file = arg.replace('\"', '')
-                        include_file = os.path.join(os.path.dirname(plugin_filename), include_file)
+                        include_file = os.path.join(os.path.dirname(filename), include_file)
 
                         # dirty hack to allow include of things without filenames
                         name, extension = os.path.splitext(include_file)
@@ -44,7 +44,7 @@ def _find_last_time_modified(plugin_filename, filename, visited):
                 if not os.path.exists(file):
                     util.error('Missing file: {}\n\tincluded from {}'.format(file, filename))
 
-                latest_time = max(latest_time, _find_last_time_modified(plugin_filename, file, visited))
+                latest_time = max(latest_time, _find_last_time_modified(file, visited))
 
         return latest_time
 
