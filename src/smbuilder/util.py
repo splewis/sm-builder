@@ -1,15 +1,23 @@
 import os
 import shutil
 
+GLOBAL_NOCOLOR = False
 
 def warning(text):
     """Prints a warning message to the console."""
-    print(bcolors.WARNING + 'WARNING: ' + bcolors.ENDC + text)
+    if GLOBAL_NOCOLOR:
+        print('WARNING: ' + text)
+    else:
+        print(bcolors.WARNING + 'WARNING: ' + bcolors.ENDC + text)
 
 
 def error(text, die=True):
     """Prints an error message to the console and kills the process if wanted."""
-    print(bcolors.FAIL + 'ERROR: ' + bcolors.ENDC + text)
+    if GLOBAL_NOCOLOR:
+        print('ERROR: ' + text)
+    else:
+        print(bcolors.FAIL + 'ERROR: ' + bcolors.ENDC + text)
+
     if die:
         exit(1)
 
