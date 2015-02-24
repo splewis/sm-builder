@@ -202,7 +202,6 @@ methodmap MyStruct < Handle {
 
         actual_list = actual_output.strip().split('\n')
         expected_list = expected_output.strip().split('\n')
-        print actual_output
 
         self.assertEqual(len(actual_list), len(expected_list))
 
