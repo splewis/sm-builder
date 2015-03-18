@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+import argparse
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='A sourcemod plugin versioning tool')
+    parser.add_argument('path', help='Input version file')
+    parser.add_argument('outpath', help='Output version file')
+    parser.add_argument('build', help='Build number')
+    args = parser.parse_args()
+
+    # read in our version file
+    version_file = args.path
+    version_line_string = None
+    with open(version_file) as f:
+        lines = f.readlines()
+        for line in lines:
+            line = line.strip()
+            if '#define PLUGIN_VERSION' in line:
+                version_line_string = line
+                break
+
+    if version_line_string is None:
+        print('Failed to find version string')
+        return
+
+    # get last " in the version string, append build number to it
+    index = version_line_string.rfind('\"')
+    version_line_string = version_line_string[:index] + '+' + args.build + version_line_string[index:]
+
+    # write out the result version file
+    with open(args.outpath, 'w') as f:
+        f.write(version_line_string)
+
+
+if __name__ == '__main__':
+    main()
