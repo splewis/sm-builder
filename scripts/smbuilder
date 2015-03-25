@@ -44,7 +44,11 @@ class SMBuilderSettings:
             parser.add_section('Settings')
             for key in self.settings:
                 parser.set('Settings', key, self.settings[key])
-            os.makedirs(os.path.dirname(filename))
+
+            cfg_dir = os.path.dirname(filename)
+            if not os.path.exists(cfg_dir):
+                os.makedirs(cfg_dir)
+
             with open(filename, 'w') as f:
                 parser.write(f)
             print('Settings written to {}'.format(filename))
