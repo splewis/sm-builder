@@ -26,7 +26,9 @@ def _find_last_time_modified(filename, visited):
                 optional = '#tryinclude' in line
                 if '#include' in line or optional:
                     arg = line.split(' ')[1].strip()
-                    if arg.startswith('<'):
+                    if not arg:
+                        pass
+                    elif arg.startswith('<'):
                         # TODO: also read system includes
                         pass
                     elif arg.startswith('\"'):

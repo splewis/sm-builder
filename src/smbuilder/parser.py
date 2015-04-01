@@ -95,13 +95,19 @@ def register_plugin(name=None, source=None, deps=None, binary=None):
     """
     Registers a new Plugin.
     """
+    source_path = None
+    binary_path = None
+    current_path = os.path.join(*DirectoryStack)
+
     if source and binary:
         msg = 'the source and binary fields cannot be used together in a plugin'
         raise ValueError(msg)
     if source:
+        source_path = os.path.join(current_path, source)
         if not name:
             name = util.file_to_plugin_name(source)
     elif binary:
+        binary_path = os.path.join(current_path, binary)
         if not name:
             name = util.file_to_plugin_name(binary)
     else:
@@ -112,14 +118,12 @@ def register_plugin(name=None, source=None, deps=None, binary=None):
         msg = 'duplicated plugin name {}'.format(name)
         raise ValueError(msg)
 
-    current_path = os.path.join(*DirectoryStack)
-    source_path = os.path.join(current_path, source)
     smbuildfile = os.path.join(current_path, CONFIG_NAME)
 
     if deps is None:
         deps = []
 
-    Plugins[name] = base.PluginContainer(name, source_path, binary, smbuildfile, deps)
+    Plugins[name] = base.PluginContainer(name, source_path, binary_path, smbuildfile, deps)
 
 
 def register_package(name=None, plugins=None, disabled_plugins=None, filegroups=None, extends=None,

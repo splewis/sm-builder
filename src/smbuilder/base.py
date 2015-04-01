@@ -19,13 +19,17 @@ class PluginContainer:
         self.binary = binary
         self.smbuildfile = smbuildfile
         self.deps = deps
-        self.source_dir = os.path.relpath(os.path.dirname(source), '.')
+        if source:
+            self.source_dir = os.path.relpath(os.path.dirname(source), '.')
+        else:
+            self.source_dir = os.path.relpath(os.path.dirname(binary), '.')
+
         self.source_files = set()
 
     def compile(self, compiler, output_dir, flags):
         """Compiles, if needed the plugin and returns whether it was compiled."""
         if self.binary:
-            shutil.copyfile(self.binary, output_dir)
+            shutil.copyfile(self.binary, os.path.join(output_dir, self.name + '.smx'))
             return False
 
         latest_source_change, self.source_files = (
