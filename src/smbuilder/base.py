@@ -100,14 +100,14 @@ class PackageContainer:
         self.template_args = template_args
         self.disabled = disabled
 
-    def create(self, output_dir, packages, plugins):
+    def create(self, output_dir, packages, plugins, nosource):
         """Creates the package output."""
         # clears out the package, then rebuilds it
         package_dir = os.path.join(output_dir, self.name)
         if os.path.exists(package_dir):
             shutil.rmtree(package_dir)
         util.mkdir(package_dir)
-        build_package(self, package_dir, packages, plugins)
+        build_package(self, package_dir, packages, plugins, nosource)
         replace_args(self, package_dir, packages, plugins)
 
         # deal with any plugins supposed to be disabled
@@ -126,11 +126,11 @@ class PackageContainer:
                 shutil.move(src, dst)
 
 
-def build_package(package, package_dir, packages, plugins):
+def build_package(package, package_dir, packages, plugins, nosource):
     """Support function for building package files into a given directory."""
     for p in package.extends_list:
         try:
-            build_package(packages[p], package_dir, packages, plugins)
+            build_package(packages[p], package_dir, packages, plugins, nosource)
         except KeyError:
             err_msg = 'Package {} extends non-existent package {}'
             util.error(err_msg.format(package.name, p))
@@ -142,24 +142,28 @@ def build_package(package, package_dir, packages, plugins):
     translation_dir = os.path.join(sm_dir, 'translations')
     data_dir = os.path.join(sm_dir, 'data')
     gamedata_dir = os.path.join(sm_dir, 'gamedata')
-
     output_source_dir = os.path.join(plugin_dir, '..', 'scripting')
-    util.mkdir(output_source_dir)
 
     for p in package.plugins:
         if p not in plugins:
             err_msg = 'Package {} used non-existent plugin {}'
             util.error(err_msg.format(package.name, p))
 
+        # copy plugin binaries
         util.mkdir(plugin_dir)
         binary_path = os.path.join(package_dir, '..', 'plugins', p + '.smx')
         shutil.copy2(binary_path, plugin_dir)
-        for source_file in plugins[p].source_files:
-            source_path = os.path.join(plugins[p].source_dir, source_file)
-            output_file_path = os.path.join(output_source_dir, source_file)
-            util.mkdir(os.path.dirname(output_file_path))
-            shutil.copyfile(source_path, output_file_path)
 
+        # copy source files
+        if not nosource:
+            util.mkdir(output_source_dir)
+            for source_file in plugins[p].source_files:
+                source_path = os.path.join(plugins[p].source_dir, source_file)
+                output_file_path = os.path.join(output_source_dir, source_file)
+                util.mkdir(os.path.dirname(output_file_path))
+                shutil.copyfile(source_path, output_file_path)
+
+    # copy filegroup definitions
     for filegroup in package.filegroups:
         filegroup_out_dir = os.path.join(package_dir, filegroup)
         util.mkdir(filegroup_out_dir)
@@ -169,6 +173,7 @@ def build_package(package, package_dir, packages, plugins):
             else:
                 shutil.copy2(f, filegroup_out_dir)
 
+    # copy everything else
     util.safe_copytree(package.configs, config_dir)
     util.safe_copytree(package.translations, translation_dir)
     util.safe_copytree(package.cfg, cfg_dir)
@@ -183,13 +188,18 @@ def replace_args(package, package_dir, packages, plugins):
     for root, dirs, files in os.walk(package_dir):
         for file in files:
             path = os.path.join(root, file)
-            if '.cfg' in path:
+            text_extensions = ['.cfg', '.ini', '.txt']
+            if any(map(lambda extension: extension in file, text_extensions)):
                 filedata = ''
                 with open(path, 'r') as f:
                     filedata = f.read()
-                filedata = templatize(filedata, template_args)
+                    templatized = ''
+                    try:
+                        templatized = templatize(filedata, template_args)
+                    except UnicodeDecodeError:
+                        templatized = filedata
                 with open(path, 'w') as f:
-                    f.write(filedata)
+                    f.write(templatized)
 
 
 def templatize(text, args):
