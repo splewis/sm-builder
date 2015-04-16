@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
+import subprocess
 
+
+def get_git_revision_short_hash():
+    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
 
 def main():
     parser = argparse.ArgumentParser(
@@ -9,6 +13,9 @@ def main():
     parser.add_argument('path', help='Input version file')
     parser.add_argument('outpath', help='Output version file')
     parser.add_argument('build', help='Build number')
+    parser.add_argument('--gitcommit', action='store_true', help='Include git commit hash')
+    parser.add_argument('--version_macro', nargs='?', default='PLUGIN_VERSION')
+    parser.add_argument('--commit_macro', nargs='?', default='COMMIT_STRING')
     args = parser.parse_args()
 
     # read in our version file
@@ -18,7 +25,8 @@ def main():
         lines = f.readlines()
         for line in lines:
             line = line.strip()
-            if '#define PLUGIN_VERSION' in line:
+            version_macro_definition = '#define {}'.format(args.version_macro)
+            if version_macro_definition in line:
                 version_line_string = line
                 break
 
@@ -32,7 +40,11 @@ def main():
 
     # write out the result version file
     with open(args.outpath, 'w') as f:
-        f.write(version_line_string)
+        f.write(version_line_string + '\n')
+
+        if args.gitcommit:
+            commit_line_string = '#define {} \"{}\"'.format(args.commit_macro, get_git_revision_short_hash())
+            f.write(commit_line_string + '\n')
 
 
 if __name__ == '__main__':
