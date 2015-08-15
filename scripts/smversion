@@ -16,6 +16,7 @@ def main():
     parser.add_argument('--gitcommit', action='store_true', help='Include git commit hash')
     parser.add_argument('--version_macro', nargs='?', default='PLUGIN_VERSION')
     parser.add_argument('--commit_macro', nargs='?', default='COMMIT_STRING')
+    parser.add_argument('--build_number_only', action='store_true')
     args = parser.parse_args()
 
     # read in our version file
@@ -34,9 +35,12 @@ def main():
         print('Failed to find version string')
         return
 
-    # get last " in the version string, append build number to it
-    index = version_line_string.rfind('\"')
-    version_line_string = version_line_string[:index] + '+' + args.build + version_line_string[index:]
+    if args.build_number_only:
+        version_line_string = 'Build ' + args.build
+    else:
+        # get last " in the version string, append build number to it
+        index = version_line_string.rfind('\"')
+        version_line_string = version_line_string[:index] + '+' + args.build + version_line_string[index:]
 
     # write out the result version file
     with open(args.outpath, 'w') as f:
