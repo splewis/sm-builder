@@ -36,7 +36,7 @@ def main():
         return
 
     if args.build_number_only:
-        version_line_string = 'Build ' + args.build
+        version_line_string = '#define {} \"Build {}\"'.format(args.version_macro, args.build)
     else:
         # get last " in the version string, append build number to it
         index = version_line_string.rfind('\"')
