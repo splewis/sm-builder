@@ -1,17 +1,29 @@
+sudo: false
+
 language: python
   - "3.4"
 
+addons:
+    apt_packages:
+        - lib32stdc++6  # needed for spcomp
+        - elinks
+
+env:
+    - SMVERSION=1.7
+
 install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libc6:i386 libgcc1:i386 gcc-4.6-base:i386 libstdc++5:i386 libstdc++6:i386 zip unzip lynx
-  - sudo pip install -r requirements.txt
-  - SMPATTERN="http:.*sourcemod-.*-linux.*"
-  - SMURL="http://www.sourcemod.net/smdrop/1.6/"
-  - SMPACKAGE=`lynx -dump "$SMURL" | egrep -o "$SMPATTERN" | tail -1`
-  - wget $SMPACKAGE
-  - tar -xzf $(basename "$SMPACKAGE")
-  - chmod +x addons/sourcemod/scripting/spcomp
-  - PATH+=":$PWD/addons/sourcemod/scripting"
+    # install smbuilder
+    - pip install --user -r requirements.txt
+    - python setup.py install --prefix=~/.local
+
+    # install the sourcemod compiler
+    - SMPACKAGE="http://sourcemod.net/latest.php?os=linux&version=${SMVERSION}"
+    - wget $SMPACKAGE
+    - tar xfz $(basename $SMPACKAGE)
+    - cd addons/sourcemod/scripting/
+    - chmod +x spcomp
+    - PATH+=":$PWD"
+    - cd ../../..
 
 script:
   - "python src/smbuilder/test_cases.py"
