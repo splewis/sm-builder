@@ -226,6 +226,7 @@ def get_template_args(package, packages, plugins):
     for dep in deps:
         plugin_binaries.append(plugins[dep].name + '.smx')
     args['plugin_binaries'] = plugin_binaries
+    args['package'] = package.name
 
     return args
 
