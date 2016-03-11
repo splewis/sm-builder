@@ -71,8 +71,10 @@ def main():
     parser = argparse.ArgumentParser(
         description='A sourcemod build and packaging tool.')
     parser.add_argument('target', nargs='?', default='.')
-    parser.add_argument('-c', '--compiler', help='Sourcepawn compiler to use.')
-    parser.add_argument('--flags', nargs='?', help='Flags to pass to all compiled plugins', default='')
+    parser.add_argument('-c', '--compiler',
+        help='Sourcepawn compiler to use.')
+    parser.add_argument('--flags', nargs='?',
+        help='Flags to pass to all compiled plugins', default='')
     parser.add_argument('--nocolor', action='store_true')
     parser.add_argument('--nosource', action='store_true')
     args = parser.parse_args()
@@ -87,7 +89,8 @@ def main():
         smbuilder.util.GLOBAL_NOCOLOR = args.nocolor
 
         try:
-            smbuilder.builder.perform_builds(args.target, settings['compiler'], args.flags, args.nosource)
+            smbuilder.builder.perform_builds(args.target,
+                settings['compiler'], args.flags, args.nosource)
         except Exception as e:
             smbuilder.util.error(str(e), True)
 

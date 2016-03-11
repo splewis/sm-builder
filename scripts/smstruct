@@ -9,8 +9,10 @@ import argparse
 def main():
     parser = argparse.ArgumentParser(
         description='A sourcemod struct include generator')
-    parser.add_argument('input', nargs='+', help='Input files to read from')
-    parser.add_argument('-o', '--output', default='.', help='Output location for the includes')
+    parser.add_argument('input', nargs='+',
+        help='Input files to read from')
+    parser.add_argument('-o', '--output', default='.',
+        help='Output location for the includes')
     args = parser.parse_args()
 
     try:

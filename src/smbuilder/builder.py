@@ -22,7 +22,7 @@ def build(smbuildfile, compiler, plugins, packages, flags='', output_dir='builds
 
     # scan deps for what we need to do
     packages_to_build = set()
-    for name, package in packages.iteritems():
+    for name, package in packages.items():
         if smbuildfile == package.smbuildfile:
             packages_to_build.add(name)
 

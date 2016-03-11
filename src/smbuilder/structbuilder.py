@@ -3,7 +3,7 @@ import util
 import os
 
 
-def get_default_value(type):
+def get_field_default_value(type):
     if type == 'float':
         return  '0.0'
     elif type == 'Handle':
@@ -73,8 +73,8 @@ def create_struct_functions(name, elems):
     lines.append('')
 
     # helper macros
-    lines.append('#define Create{}() {}:{}()'.format(name, name, constructor_name))
-    lines.append('#define {}FromArray(%1,%2) ({}:GetArrayCell(%1, %2))'.format(name, name))
+    lines.append('#define Create{}() view_as<{}>({}())'.format(name, name, constructor_name))
+    lines.append('#define {}FromArray(%1,%2) view_as<{}>(GetArrayCell(%1, %2))'.format(name, name))
     lines.append('')
 
     # constructor
@@ -83,7 +83,7 @@ def create_struct_functions(name, elems):
 
     curr_index = 0
     for e in elems:
-        default_value = get_default_value(e.type)
+        default_value = get_field_default_value(e.type)
         if e.is_array:
             lines.append('\tfor(int i = 0; i < {}; i++)'.format(e.array_size))
             lines.append('\t\tPushArrayCell(dataList, {});'.format(default_value))
@@ -96,11 +96,16 @@ def create_struct_functions(name, elems):
     lines.append('}')
     lines.append('')
 
+    def normalizeFieldForFunctions(name):
+       if len(name) == 0:
+          return name
+       else:
+          return name[0].upper() + name[1:]
 
     # getters
     curr_index = 0
     for e in elems:
-        elem_func_suffix = e.name.title()
+        elem_func_suffix = normalizeFieldForFunctions(e.name)
 
         if e.is_array:
             lines.append('stock void {}_Get{}(Handle {}, {} buffer[{}]) {{'.format(function_prefix, elem_func_suffix, struct_param_name, e.type, e.array_size))
@@ -125,7 +130,7 @@ def create_struct_functions(name, elems):
     # setters
     curr_index = 0
     for e in elems:
-        elem_func_suffix = e.name.title()
+        elem_func_suffix = normalizeFieldForFunctions(e.name)
 
         if e.is_array:
             lines.append('stock void {}_Set{}(Handle {}, const {} value[{}]) {{'.format(function_prefix, elem_func_suffix, struct_param_name, e.type, e.array_size))
@@ -157,10 +162,11 @@ def create_struct_functions(name, elems):
             lines.append('\t}')
             lines.append('')
 
-            lines.append('\tpublic {} {}At(int index) {{'.format(e.type, e.getter_method_name, e.type, e.array_size))
-            lines.append('\t\treturn {}At(this, index);'.format(e.getter_function_name))
-            lines.append('\t}')
-            lines.append('')
+            if e.type != 'string':
+                lines.append('\tpublic {} {}At(int index) {{'.format(e.type, e.getter_method_name, e.type, e.array_size))
+                lines.append('\t\treturn {}At(this, index);'.format(e.getter_function_name))
+                lines.append('\t}')
+                lines.append('')
 
             # setter
             lines.append('\tpublic void {}(const {} value[{}]) {{'.format(e.setter_method_name, e.type, e.array_size))
@@ -168,10 +174,11 @@ def create_struct_functions(name, elems):
             lines.append('\t}')
             lines.append('')
 
-            lines.append('\tpublic void {}At({} value, int index) {{'.format(e.setter_method_name, e.type, e.array_size))
-            lines.append('\t\t{}At(this, value, index);'.format(e.setter_function_name))
-            lines.append('\t}')
-            lines.append('')
+            if e.type != 'string':
+                lines.append('\tpublic void {}At({} value, int index) {{'.format(e.setter_method_name, e.type, e.array_size))
+                lines.append('\t\t{}At(this, value, index);'.format(e.setter_function_name))
+                lines.append('\t}')
+                lines.append('')
 
 
         else:
@@ -194,21 +201,19 @@ def create_struct_functions(name, elems):
             lines.append('\t}')
             lines.append('')
 
-
     lines.append('}')
     lines.append('')
 
     lines = map(lambda l: l.replace('\t', '    '), lines)
-
-    text = '\n'.join(lines)
-
-    return text
+    return '\n'.join(lines)
 
 
+# TODO: ... remove this global variable
 Structs = {}
 def add_struct(name, fields):
     global Structs
     values = []
+    # TODO: add a way to give a default value to a field
     for member_name in fields:
         member_type = fields[member_name]
         values.append((member_name, member_type))
