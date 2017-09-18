@@ -9,7 +9,7 @@ addons:
         - elinks
 
 env:
-    - SMVERSION=1.7
+    - SMVERSION=1.8
 
 install:
     # install smbuilder

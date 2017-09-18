@@ -7,6 +7,9 @@ import subprocess
 def get_git_revision_short_hash():
     return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
 
+def get_git_revision_short_long_hash():
+    return subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
+
 def main():
     parser = argparse.ArgumentParser(
         description='A sourcemod plugin versioning tool')
@@ -16,6 +19,7 @@ def main():
     parser.add_argument('--gitcommit', action='store_true', help='Include git commit hash')
     parser.add_argument('--version_macro', nargs='?', default='PLUGIN_VERSION')
     parser.add_argument('--commit_macro', nargs='?', default='COMMIT_STRING')
+    parser.add_argument('--commit_macro_long', nargs='?', default='COMMIT_STRING_LONG')
     parser.add_argument('--build_number_only', action='store_true')
     args = parser.parse_args()
 
