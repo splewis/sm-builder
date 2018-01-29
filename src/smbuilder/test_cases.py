@@ -1,7 +1,7 @@
-import base
-import builder
-import parser
-import structbuilder
+from . import base
+from . import builder
+from . import parser
+from . import structbuilder
 
 import os
 import unittest

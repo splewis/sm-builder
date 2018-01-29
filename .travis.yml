@@ -1,7 +1,7 @@
 sudo: false
 
 language: python
-  - "3.4"
+  - "3.6"
 
 addons:
     apt_packages:
@@ -24,6 +24,7 @@ install:
     - chmod +x spcomp
     - PATH+=":$PWD"
     - cd ../../..
+    - cd src/
 
 script:
-  - "python src/smbuilder/test_cases.py"
+  - "python -m smbuilder.test_cases"
