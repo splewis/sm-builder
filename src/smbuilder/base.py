@@ -1,5 +1,5 @@
-from . import includescanner 
-from . import util 
+from . import includescanner
+from . import util
 
 import fileinput
 import fnmatch

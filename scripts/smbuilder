@@ -23,7 +23,7 @@ class SMBuilderSettings:
         filename = self._get_cfg_file()
         try:
             parser = configparser.ConfigParser()
-            parser.read(filename)            
+            parser.read(filename)
             items = parser.items('Settings')
             for key, value in items:
                 self.settings[key] = value
