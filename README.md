@@ -66,7 +66,7 @@ For a unix-style system, you should run:
 
 1. Clone the repository: ``git clone https://github.com/splewis/sm-builder``
 1. Move into the repo: ``cd sm-builder``
-1. Install [pip](http://pip.readthedocs.org/en/latest/installing.html) for managing the python dependencies: ``sudo apt-get install python-pip`` for debian and ubuntu
+1. Install [pip](http://pip.readthedocs.org/en/latest/installing.html) for managing the python dependencies: ``sudo apt-get install python3-pip`` for debian and ubuntu
 1. Install python dependencies if needed: ``sudo pip install -r requirements.txt``
 1. Install smbuiler: ``sudo python setup.py install``
 1. You're done! You can now invoke ``smbuilder`` on the command line.

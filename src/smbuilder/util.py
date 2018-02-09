@@ -24,7 +24,7 @@ def error(text, die=True):
 
 def mkdir(*args):
     """Creates a directory path if it doesn't exist."""
-    path = ''.join(os.path.join(args))
+    path = os.path.join(*args)
     if not os.path.exists(path):
         os.makedirs(path)
 
