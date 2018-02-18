@@ -1,4 +1,4 @@
-from . import util
+import util
 
 import os
 

@@ -5,7 +5,7 @@ import smbuilder.parser
 import smbuilder.util
 
 import argparse
-import configparser
+import ConfigParser
 import os
 import shutil
 
@@ -22,7 +22,7 @@ class SMBuilderSettings:
 
         filename = self._get_cfg_file()
         try:
-            parser = configparser.ConfigParser()
+            parser = ConfigParser.ConfigParser()
             parser.read(filename)
             items = parser.items('Settings')
             for key, value in items:
@@ -40,7 +40,7 @@ class SMBuilderSettings:
     def _create_settings_file(self):
         filename = self._get_cfg_file()
         if not os.path.exists(filename):
-            parser = configparser.ConfigParser()
+            parser = ConfigParser.ConfigParser()
             parser.add_section('Settings')
             for key in self.settings:
                 parser.set('Settings', key, self.settings[key])

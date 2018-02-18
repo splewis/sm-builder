@@ -1,6 +1,6 @@
-from . import base
-from . import parser
-from . import util
+import base
+import parser
+import util
 
 import os
 

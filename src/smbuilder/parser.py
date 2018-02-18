@@ -1,5 +1,5 @@
-from . import base
-from . import util
+import base
+import util
 
 import fnmatch
 import glob
